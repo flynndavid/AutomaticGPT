@@ -1,0 +1,16 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  lint-and-type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npx expo prebuild --no-install --platform ios
+      - run: npx expo prebuild --no-install --platform android 

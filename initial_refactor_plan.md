@@ -7,12 +7,14 @@ This document outlines a strategic refactoring plan to prepare the automatic-san
 ## Current State Analysis
 
 ### What We Have
+
 - **Working Chat App**: Expo SDK 53 app with AI chat functionality via OpenAI GPT-4o
 - **Cross-Platform**: Targets iOS, Android, and Web with server-side rendering
 - **Modern Stack**: TypeScript, NativeWind (Tailwind for React Native), expo-router, react-native-reanimated
 - **AI Integration**: Streaming responses with tool invocation support
 
 ### Key Issues
+
 1. **Monolithic Components**: The main Chat component is ~450 lines mixing UI, state, and business logic
 2. **Performance Concerns**: Using ScrollView for messages (no virtualization)
 3. **Mixed Styling**: Combination of inline StyleSheet objects and Tailwind classes
@@ -24,9 +26,11 @@ This document outlines a strategic refactoring plan to prepare the automatic-san
 ### Phase 1: Development Infrastructure (Day 1)
 
 #### 1.1 Add ESLint & Prettier
+
 **Why**: Enforce consistent code style and catch common errors early.
 
 **Implementation**:
+
 ```bash
 npm install --save-dev eslint prettier eslint-config-prettier \
   eslint-plugin-react eslint-plugin-react-native \
@@ -35,6 +39,7 @@ npm install --save-dev eslint prettier eslint-config-prettier \
 ```
 
 Create `.eslintrc.js`:
+
 ```javascript
 module.exports = {
   root: true,
@@ -46,18 +51,19 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:tailwindcss/recommended',
-    'prettier'
+    'prettier',
   ],
   rules: {
     'react/react-in-jsx-scope': 'off', // Not needed with React 17+
     'react/prop-types': 'off', // Using TypeScript
     '@typescript-eslint/no-explicit-any': 'warn',
-    'tailwindcss/no-custom-classname': 'off' // NativeWind allows custom classes
-  }
+    'tailwindcss/no-custom-classname': 'off', // NativeWind allows custom classes
+  },
 };
 ```
 
 Create `.prettierrc`:
+
 ```json
 {
   "semi": true,
@@ -69,12 +75,14 @@ Create `.prettierrc`:
 ```
 
 #### 1.2 Setup Pre-commit Hooks
+
 ```bash
 npm install --save-dev husky lint-staged
 npx husky init
 ```
 
 Add to `package.json`:
+
 ```json
 {
   "lint-staged": {
@@ -85,7 +93,9 @@ Add to `package.json`:
 ```
 
 #### 1.3 Basic CI Pipeline
+
 Create `.github/workflows/ci.yml`:
+
 ```yaml
 name: CI
 on: [push, pull_request]
@@ -106,6 +116,7 @@ jobs:
 ```
 
 Add scripts to `package.json`:
+
 ```json
 {
   "scripts": {
@@ -141,6 +152,7 @@ src/features/chat/
 ```
 
 **Example refactor for MessageBubble.tsx**:
+
 ```typescript
 import { Text, View } from 'react-native';
 import { cn } from '@/lib/utils';
@@ -176,6 +188,7 @@ export function MessageBubble({ message, isUser }: MessageBubbleProps) {
 **Why**: ScrollView renders all messages at once. With hundreds of messages, this causes memory issues and janky scrolling.
 
 **Implementation in MessageList.tsx**:
+
 ```typescript
 import { FlatList, type ListRenderItem } from 'react-native';
 import { MessageBubble } from './MessageBubble';
@@ -219,6 +232,7 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
 **Solution**: Use NativeWind classes exclusively, reserve StyleSheet only for truly dynamic values.
 
 **Before**:
+
 ```typescript
 const styles = StyleSheet.create({
   header: {
@@ -233,6 +247,7 @@ const styles = StyleSheet.create({
 ```
 
 **After**:
+
 ```typescript
 <View className="flex-row items-center px-4 py-3">
 ```
@@ -240,6 +255,7 @@ const styles = StyleSheet.create({
 #### 3.2 Create Utility Functions for Complex Styles
 
 For styles that need platform-specific adjustments:
+
 ```typescript
 // src/lib/styles.ts
 export const headerStyle = cn(
@@ -276,6 +292,7 @@ src/
 #### 4.2 Barrel Exports
 
 Each feature folder should have an `index.ts`:
+
 ```typescript
 // src/features/chat/index.ts
 export { Chat } from './components/Chat';
@@ -288,6 +305,7 @@ export type { ChatMessage, ChatRole } from './types';
 #### 5.1 Define Domain Types
 
 Create `src/types/chat.ts`:
+
 ```typescript
 export type ChatRole = 'user' | 'assistant' | 'system';
 
@@ -311,15 +329,18 @@ export interface ToolInvocation {
 #### 5.2 API Contract Types
 
 Share types between frontend and API:
+
 ```typescript
 // src/types/api.ts
 import { z } from 'zod';
 
 export const ChatRequestSchema = z.object({
-  messages: z.array(z.object({
-    role: z.enum(['user', 'assistant', 'system']),
-    content: z.string(),
-  })),
+  messages: z.array(
+    z.object({
+      role: z.enum(['user', 'assistant', 'system']),
+      content: z.string(),
+    })
+  ),
   temperature: z.number().optional(),
 });
 
@@ -336,12 +357,13 @@ npm install --save-dev jest @types/jest jest-expo \
 ```
 
 Create `jest.config.js`:
+
 ```javascript
 module.exports = {
   preset: 'jest-expo',
   setupFilesAfterEnv: ['@testing-library/jest-native/extend-expect'],
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)'
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)',
   ],
 };
 ```
@@ -361,7 +383,7 @@ describe('MessageBubble', () => {
         isUser={true}
       />
     );
-    
+
     const message = getByText('Hello');
     expect(message).toHaveStyle({ color: '#ffffff' }); // white text for user
   });
@@ -377,6 +399,7 @@ npm install --save-dev eslint-plugin-reanimated
 ```
 
 Update `.eslintrc.js`:
+
 ```javascript
 {
   plugins: ['reanimated'],
@@ -392,10 +415,7 @@ Update `.eslintrc.js`:
 // src/lib/animations.ts
 import { runOnJS, withTiming } from 'react-native-reanimated';
 
-export const safeAnimateWithCallback = (
-  value: number,
-  callback: () => void
-) => {
+export const safeAnimateWithCallback = (value: number, callback: () => void) => {
   'worklet';
   return withTiming(value, {}, (finished) => {
     if (finished) {
@@ -410,6 +430,7 @@ export const safeAnimateWithCallback = (
 #### 8.1 Centralized Config
 
 Create `src/config/index.ts`:
+
 ```typescript
 const getEnvVar = (key: string, fallback?: string): string => {
   const value = process.env[key];
@@ -432,16 +453,16 @@ export const config = {
 
 ## Implementation Timeline
 
-| Phase | Duration | Priority | Dependencies |
-|-------|----------|----------|--------------|
-| 1. Dev Infrastructure | 0.5 days | High | None |
-| 2. Component Split | 1.5 days | High | Phase 1 |
-| 3. FlatList Migration | 0.5 days | High | Phase 2 |
-| 4. Styling Consolidation | 0.5 days | Medium | Phase 1 |
-| 5. Project Organization | 0.5 days | Medium | Phase 2 |
-| 6. Type Safety | 0.5 days | High | Phase 5 |
-| 7. Testing Setup | 1 day | Medium | Phase 1 |
-| 8. Config Management | 0.5 days | Low | None |
+| Phase                    | Duration | Priority | Dependencies |
+| ------------------------ | -------- | -------- | ------------ |
+| 1. Dev Infrastructure    | 0.5 days | High     | None         |
+| 2. Component Split       | 1.5 days | High     | Phase 1      |
+| 3. FlatList Migration    | 0.5 days | High     | Phase 2      |
+| 4. Styling Consolidation | 0.5 days | Medium   | Phase 1      |
+| 5. Project Organization  | 0.5 days | Medium   | Phase 2      |
+| 6. Type Safety           | 0.5 days | High     | Phase 5      |
+| 7. Testing Setup         | 1 day    | Medium   | Phase 1      |
+| 8. Config Management     | 0.5 days | Low      | None         |
 
 **Total: ~5 days of focused work**
 
@@ -465,16 +486,17 @@ export const config = {
 
 ## Risks & Mitigations
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Breaking existing functionality | High | Comprehensive testing, gradual rollout |
-| Team resistance to new patterns | Medium | Document benefits, provide examples |
-| Performance regression | Medium | Profile before/after, use React DevTools |
-| Increased build complexity | Low | Keep tooling minimal, document setup |
+| Risk                            | Impact | Mitigation                               |
+| ------------------------------- | ------ | ---------------------------------------- |
+| Breaking existing functionality | High   | Comprehensive testing, gradual rollout   |
+| Team resistance to new patterns | Medium | Document benefits, provide examples      |
+| Performance regression          | Medium | Profile before/after, use React DevTools |
+| Increased build complexity      | Low    | Keep tooling minimal, document setup     |
 
 ## Next Steps After Refactor
 
 With this foundation in place, the team can confidently add:
+
 - User authentication & profiles
 - Multi-modal inputs (voice, images)
 - Conversation persistence
@@ -485,6 +507,7 @@ With this foundation in place, the team can confidently add:
 ## Questions or Concerns?
 
 Before starting implementation, consider:
+
 1. Do we need to support older React Native versions?
 2. Should we add E2E testing (Detox/Maestro)?
 3. Any specific performance targets?
@@ -492,4 +515,4 @@ Before starting implementation, consider:
 
 ---
 
-*This plan provides a solid foundation for scaling the application. Each phase builds on the previous one, ensuring we don't break existing functionality while improving the architecture.* 
+_This plan provides a solid foundation for scaling the application. Each phase builds on the previous one, ensuring we don't break existing functionality while improving the architecture._

@@ -1,7 +1,7 @@
-import { useChat } from "@ai-sdk/react";
-import { UIMessage } from "ai";
-import * as Haptics from "expo-haptics";
-import { Fragment, useEffect, useRef } from "react";
+import { useChat } from '@ai-sdk/react';
+import { UIMessage } from 'ai';
+import * as Haptics from 'expo-haptics';
+import { Fragment, useEffect, useRef } from 'react';
 import {
   ScrollView,
   Text,
@@ -12,22 +12,22 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-} from "react-native";
-import Animated, { Layout, Easing, FadeIn } from "react-native-reanimated";
+} from 'react-native';
+import Animated, { Layout, Easing, FadeIn } from 'react-native-reanimated';
 
-import { KeyboardPaddingView } from "@/components/keyboard-padding";
-import { CelsiusConvertCard, WeatherCard } from "@/components/tool-cards";
-import { cn } from "@/lib/utils";
-import { Ionicons } from "@expo/vector-icons";
+import { KeyboardPaddingView } from '@/components/keyboard-padding';
+import { CelsiusConvertCard, WeatherCard } from '@/components/tool-cards';
+import { cn } from '@/lib/utils';
+import { Ionicons } from '@expo/vector-icons';
 
-const Avatar = ({ role }: { role: "user" | "assistant" | string }) => (
+const Avatar = ({ role }: { role: 'user' | 'assistant' | string }) => (
   <View
     className={cn(
-      "w-8 h-8 rounded-full items-center justify-center",
-      role === "user" ? "bg-blue-500" : "bg-gray-700"
+      'w-8 h-8 rounded-full items-center justify-center',
+      role === 'user' ? 'bg-blue-500' : 'bg-gray-700'
     )}
   >
-    {role === "user" ? (
+    {role === 'user' ? (
       <Ionicons name="person" size={18} color="white" />
     ) : (
       <Ionicons name="sparkles" size={20} color="white" />
@@ -40,13 +40,13 @@ const Header = () => (
     <Pressable style={styles.headerButton}>
       <Ionicons name="menu" size={24} color="#000" />
     </Pressable>
-    
+
     <View style={styles.headerCenter}>
       <Text style={styles.headerTitle}>ChatGPT</Text>
       <Text style={styles.headerSubtitle}>4o</Text>
       <Ionicons name="chevron-forward" size={16} color="#666" style={styles.chevron} />
     </View>
-    
+
     <Pressable style={styles.headerButton}>
       <Ionicons name="qr-code-outline" size={24} color="#000" />
     </Pressable>
@@ -85,7 +85,7 @@ export function Chat() {
     if (!input.trim()) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     handleSubmit();
-    handleInputChange("");
+    handleInputChange('');
   };
 
   if (error) {
@@ -103,7 +103,7 @@ export function Chat() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <Header />
-      
+
       <View style={styles.contentContainer}>
         <ScrollView
           ref={scrollViewRef}
@@ -115,22 +115,20 @@ export function Chat() {
           contentContainerStyle={styles.scrollContentContainer}
         >
           {messages.length === 0 && (
-            <View style={styles.emptyState}>
-              {/* Empty state content can go here if needed */}
-            </View>
+            <View style={styles.emptyState}>{/* Empty state content can go here if needed */}</View>
           )}
-          
+
           {messages.map((m) => (
             <Message key={m.id} message={m} />
           ))}
-          {isLoading && messages.at(-1)?.role !== "assistant" && (
+          {isLoading && messages.at(-1)?.role !== 'assistant' && (
             <Message
               message={
                 {
-                  id: "loading",
-                  role: "assistant",
-                  content: "",
-                  parts: [{ type: "text", text: "" }],
+                  id: 'loading',
+                  role: 'assistant',
+                  content: '',
+                  parts: [{ type: 'text', text: '' }],
                 } as UIMessage
               }
             />
@@ -139,8 +137,8 @@ export function Chat() {
 
         <View style={styles.inputContainer}>
           {messages.length === 0 && (
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               style={styles.suggestionsContainer}
               contentContainerStyle={styles.suggestionsContent}
@@ -163,12 +161,12 @@ export function Chat() {
               </Pressable>
             </ScrollView>
           )}
-          
+
           <View style={styles.inputWrapper}>
             <Pressable style={styles.plusButton}>
               <Ionicons name="add" size={24} color="#666" />
             </Pressable>
-            
+
             <TextInput
               style={styles.textInput}
               placeholder="Ask anything"
@@ -180,12 +178,12 @@ export function Chat() {
               multiline
               textAlignVertical="center"
             />
-            
+
             <View style={styles.rightButtons}>
               <Pressable style={styles.voiceButton}>
                 <Ionicons name="mic" size={20} color="#666" />
               </Pressable>
-              
+
               <Pressable
                 onPress={onSend}
                 disabled={!input.trim() || isLoading}
@@ -210,28 +208,26 @@ export function Chat() {
 }
 
 function Message({ message }: { message: UIMessage }) {
-  const isUser = message.role === "user";
+  const isUser = message.role === 'user';
 
   const content = message.parts
     .map((part) => {
       switch (part.type) {
-        case "text": {
+        case 'text': {
           if (!part.text) return null;
           return <Text>{part.text}</Text>;
         }
-        case "tool-invocation": {
+        case 'tool-invocation': {
           const { toolInvocation } = part;
-          if (toolInvocation.state === "result") {
-            if (toolInvocation.toolName === "weather") {
+          if (toolInvocation.state === 'result') {
+            if (toolInvocation.toolName === 'weather') {
               return <WeatherCard {...toolInvocation.result} />;
-            } else if (
-              toolInvocation.toolName === "convertFahrenheitToCelsius"
-            ) {
+            } else if (toolInvocation.toolName === 'convertFahrenheitToCelsius') {
               return <CelsiusConvertCard {...toolInvocation.result} />;
             }
             return (
               <Text>
-                Tool: {toolInvocation.toolName} - Result:{" "}
+                Tool: {toolInvocation.toolName} - Result:{' '}
                 {JSON.stringify(toolInvocation.result, null, 2)}
               </Text>
             );
@@ -239,9 +235,7 @@ function Message({ message }: { message: UIMessage }) {
           return (
             <View className="flex-row items-center">
               <ActivityIndicator size="small" />
-              <Text className="ml-2 text-zinc-500">
-                Calling: {toolInvocation.toolName}...
-              </Text>
+              <Text className="ml-2 text-zinc-500">Calling: {toolInvocation.toolName}...</Text>
             </View>
           );
         }
@@ -251,7 +245,7 @@ function Message({ message }: { message: UIMessage }) {
     })
     .filter(Boolean);
 
-  if (message.id === "loading") {
+  if (message.id === 'loading') {
     return (
       <Animated.View
         layout={Layout.easing(Easing.ease).delay(100)}
@@ -272,21 +266,16 @@ function Message({ message }: { message: UIMessage }) {
     <Animated.View
       layout={Layout.easing(Easing.ease).delay(100)}
       entering={FadeIn.duration(200)}
-      className={cn("flex-row items-end gap-2", isUser && "self-end")}
+      className={cn('flex-row items-end gap-2', isUser && 'self-end')}
     >
       {!isUser && <Avatar role="assistant" />}
       <View
         className={cn(
-          "p-3 rounded-2xl max-w-[85%]",
-          isUser
-            ? "bg-blue-500 rounded-br-none"
-            : "bg-white rounded-bl-none"
+          'p-3 rounded-2xl max-w-[85%]',
+          isUser ? 'bg-blue-500 rounded-br-none' : 'bg-white rounded-bl-none'
         )}
       >
-        <Text
-          style={styles.messageText}
-          className={cn(isUser ? "text-white" : "text-zinc-800")}
-        >
+        <Text style={styles.messageText} className={cn(isUser ? 'text-white' : 'text-zinc-800')}>
           {content.map((jsx, key) => (
             <Fragment key={key}>{jsx}</Fragment>
           ))}
@@ -299,39 +288,39 @@ function Message({ message }: { message: UIMessage }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5e5",
+    borderBottomColor: '#e5e5e5',
   },
   headerButton: {
     width: 40,
     height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerCenter: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#000",
+    fontWeight: '600',
+    color: '#000',
     marginRight: 4,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: "#666",
+    color: '#666',
     marginRight: 4,
   },
   chevron: {
@@ -339,7 +328,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   scrollContentContainer: {
     paddingHorizontal: 16,
@@ -349,37 +338,37 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
     paddingBottom: 40,
   },
   suggestionCard: {
-    backgroundColor: "#f8f8f8",
+    backgroundColor: '#f8f8f8',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: "#e5e5e5",
+    borderColor: '#e5e5e5',
     minWidth: 140,
     maxWidth: 180,
   },
   suggestionTitle: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#000",
+    fontWeight: '600',
+    color: '#000',
     marginBottom: 2,
   },
   suggestionSubtitle: {
     fontSize: 11,
-    color: "#666",
+    color: '#666',
     lineHeight: 14,
   },
   inputContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   inputWrapper: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    backgroundColor: "#f8f8f8",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    backgroundColor: '#f8f8f8',
     borderRadius: 24,
     paddingHorizontal: 4,
     paddingVertical: 4,
@@ -391,8 +380,8 @@ const styles = StyleSheet.create({
   plusButton: {
     width: 40,
     height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 4,
   },
   textInput: {
@@ -401,30 +390,30 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     paddingHorizontal: 8,
     paddingVertical: 10,
-    color: "#000",
+    color: '#000',
     maxHeight: 100,
   },
   rightButtons: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4,
   },
   voiceButton: {
     width: 40,
     height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sendButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: '#007AFF',
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: "#C2C2C2",
+    backgroundColor: '#C2C2C2',
   },
   sendButtonPressed: {
     opacity: 0.7,

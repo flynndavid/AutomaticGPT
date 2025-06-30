@@ -1,21 +1,21 @@
-import { openai } from "@ai-sdk/openai";
-import { streamText, tool } from "ai";
-import { z } from "zod";
+import { openai } from '@ai-sdk/openai';
+import { streamText, tool } from 'ai';
+import { z } from 'zod';
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  console.log("post messages:", messages);
+  console.log('post messages:', messages);
 
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: openai('gpt-4o'),
     messages,
     tools: {
       // https://ai-sdk.dev/docs/getting-started/expo#enhance-your-chatbot-with-tools
       weather: tool({
-        description: "Get the weather in a location (fahrenheit)",
+        description: 'Get the weather in a location (fahrenheit)',
         parameters: z.object({
-          location: z.string().describe("The location to get the weather for"),
+          location: z.string().describe('The location to get the weather for'),
         }),
         async execute({ location }) {
           const temperature = Math.round(Math.random() * (90 - 32) + 32);
@@ -27,11 +27,9 @@ export async function POST(req: Request) {
       }),
 
       convertFahrenheitToCelsius: tool({
-        description: "Convert a temperature in fahrenheit to celsius",
+        description: 'Convert a temperature in fahrenheit to celsius',
         parameters: z.object({
-          temperature: z
-            .number()
-            .describe("The temperature in fahrenheit to convert"),
+          temperature: z.number().describe('The temperature in fahrenheit to convert'),
         }),
         async execute({ temperature }) {
           const celsius = Math.round((temperature - 32) * (5 / 9));
@@ -49,8 +47,8 @@ export async function POST(req: Request) {
     headers: {
       // Issue with iOS NSURLSession that requires Content-Type set in order to enable streaming.
       // https://github.com/expo/expo/issues/32950#issuecomment-2508297646
-      "Content-Type": "application/octet-stream",
-      "Content-Encoding": "none",
+      'Content-Type': 'application/octet-stream',
+      'Content-Encoding': 'none',
     },
   });
 }
@@ -59,10 +57,10 @@ export async function POST(req: Request) {
 // https://ai-sdk.dev/docs/troubleshooting/use-chat-an-error-occurred
 function errorHandler(error: unknown) {
   if (error == null) {
-    return "unknown error";
+    return 'unknown error';
   }
 
-  if (typeof error === "string") {
+  if (typeof error === 'string') {
     return error;
   }
 

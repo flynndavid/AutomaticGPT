@@ -1,14 +1,14 @@
-import "../global.css";
-import "@/utils/fetch-polyfill";
+import '../global.css';
+import '@/utils/fetch-polyfill';
 
-import { Stack } from "expo-router";
-import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import { Stack } from 'expo-router';
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
-export { ErrorBoundary } from "expo-router";
+export { ErrorBoundary } from 'expo-router';
 
 // These are the default stack options for iOS, they disable on other platforms.
 const DEFAULT_STACK_HEADER: NativeStackNavigationOptions =
-  process.env.EXPO_OS !== "ios"
+  process.env.EXPO_OS !== 'ios'
     ? {}
     : {
         headerTransparent: false,
