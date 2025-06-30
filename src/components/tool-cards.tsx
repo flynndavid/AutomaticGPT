@@ -1,47 +1,37 @@
-import { Text, ViewProps } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import { Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-function ToolCard(props: ViewProps) {
+export function WeatherCard(props: { location: string; temperature: number }) {
   return (
-    <Animated.View
-      entering={FadeIn}
-      className="p-4 rounded-2xl gap bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-300 transition-all duration-200 hover:from-gray-100 hover:to-gray-200"
-      style={{ borderCurve: "continuous" }}
-      {...props}
-    />
+    <View className="bg-white/90 p-3 rounded-lg w-full flex-row items-center gap-3">
+      <Ionicons name="cloud" size={24} color="#4b5563" />
+      <View>
+        <Text className="font-bold text-base text-zinc-800">
+          Weather for {props.location}
+        </Text>
+        <Text className="text-zinc-600 text-base">
+          {props.temperature}°F
+        </Text>
+      </View>
+    </View>
   );
 }
 
-export function WeatherCard({
-  location,
-  temperature,
-}: {
-  location: string;
+export function CelsiusConvertCard(props: {
   temperature: number;
-}) {
-  return (
-    <ToolCard>
-      <Text className="text-lg font-semibold">Weather in {location}</Text>
-      <Text className="text-gray-600">Current temperature:</Text>
-      <Text className="text-xl font-bold">{temperature}°F</Text>
-    </ToolCard>
-  );
-}
-
-export function CelsiusConvertCard({
-  celsius,
-  temperature,
-}: {
   celsius: number;
-  temperature: number;
 }) {
   return (
-    <ToolCard>
-      <Text className="text-lg font-semibold">Temperature Conversion</Text>
-      <Text className="text-gray-600">
-        Converted {temperature}°F to Celsius:
-      </Text>
-      <Text className="text-xl font-bold">{celsius}°C</Text>
-    </ToolCard>
+    <View className="bg-white/90 p-3 rounded-lg w-full flex-row items-center gap-3">
+      <Ionicons name="thermometer" size={24} color="#4b5563" />
+      <View>
+        <Text className="font-bold text-base text-zinc-800">
+          Temperature Conversion
+        </Text>
+        <Text className="text-zinc-600 text-base">
+          {props.temperature}°F is equal to {props.celsius}°C
+        </Text>
+      </View>
+    </View>
   );
 }

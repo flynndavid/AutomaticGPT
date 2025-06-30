@@ -1,0 +1,106 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Technical Stack & Architecture Overview
+
+This document describes the foundational technologies, project structure, and development conventions used in **automatic-sandbox-expo-1**. Read this before adding new features or refactoring existing code.
+
+---
+
+## 1. High-Level Overview
+
+* **Platform**: [Expo](mdc:https:/docs.expo.dev) SDK 53 targeting iOS, Android, and Web (server–rendered output).
+* **Language**: TypeScript
+* **Navigation**: [expo-router](mdc:https:/expo.github.io/router) (file-based routing)
+* **Styling**: [NativeWind](mdc:https:/www.nativewind.dev) (Tailwind CSS for React Native)
+* **AI Integration**: [ai-sdk](mdc:https:/ai-sdk.dev) with OpenAI GPT-4o via serverless API routes.
+* **Animation**: react-native-reanimated v3
+
+## 2. Project Layout
+
+Path | Purpose
+---- | -------
+`[src/app](mdc:src/app)` | File-based routes & API endpoints (served by expo-router)
+`[src/components](mdc:src/components)` | Reusable UI components
+`[src/utils](mdc:src/utils)` | Cross-platform helpers (e.g. fetch polyfill)
+`[src/lib](mdc:src/lib)` | Small generic utilities (e.g. class merger)
+
+Key routing files:
+* Global layout – `[src/app/_layout.tsx](mdc:src/app/_layout.tsx)` sets up the default native stack.
+* Home screen – `[src/app/index.tsx](mdc:src/app/index.tsx)` renders the `Chat` component.
+
+## 3. Core Libraries & Config
+
+* **Expo & React Native** – Configured in `[app.json](mdc:app.json)`.
+* **Tailwind / NativeWind** – Tailwind classes are enabled by `[tailwind.config.js](mdc:tailwind.config.js)` and `[metro.config.js](mdc:metro.config.js)`; Babel preset added in `[babel.config.js](mdc:babel.config.js)`.
+* **TypeScript paths** – `@/` alias defined in `[tsconfig.json](mdc:tsconfig.json)` maps to `src/*`.
+* **AI tools** – API route `[chat+api.ts](mdc:src/app/api/chat+api.ts)` streams OpenAI responses and demonstrates **tool invocation** with zod-validated parameters.
+* **Fetch polyfill** – `[fetch-polyfill.ts](mdc:src/utils/fetch-polyfill.ts)` patches `fetch` & structured cloning to match WinterCG spec on native platforms.
+
+## 4. Styling Conventions
+
+1. Prefer Tailwind utility classes via NativeWind for **all** styling.
+2. Merge / conditionally apply classes with `cn()` from `[utils.ts](mdc:src/lib/utils.ts)`.
+3. Custom CSS lives in `[src/global.css](mdc:src/global.css)`; avoid inline styles unless dynamic values are required.
+
+## 5. Animation Guidelines
+
+* Use Reanimated v3 for performant animations.
+* **Never** call JS functions directly from a worklet – wrap calls with `runOnJS()` to prevent native crashes.
+
+## 6. Adding Routes & Screens
+
+1. Create a new file under `src/app/`. Its filename determines the route (e.g. `profile.tsx → /profile`).
+2. Complex flows can nest directories (e.g. `settings/account.tsx`).
+3. Export React components; expo-router automatically registers them.
+4. Re-use the pattern in `_layout.tsx` for setting screen options.
+
+## 7. API Routes (Server Actions)
+
+* Any file ending with `+api.ts` inside `src/app` exports standard Fetch API handlers (`GET`, `POST`, etc.).
+* **chat+api.ts** shows streaming with `streamText` and tool definitions.
+* Keep endpoints stateless and **avoid reading secret `.env` files in code** – ask maintainers to provide required env vars at runtime.
+
+## 8. State Management
+
+* Lightweight local state with React hooks.
+* The chat UI leverages `useChat` from **@ai-sdk/react** which handles streaming state internally; global state libraries (Zustand, Redux) are **not** installed—introduce them only if strictly necessary.
+
+## 9. Development & Tooling
+
+Scripts in `[package.json](mdc:package.json)`:
+* `npm start`   → `expo start` (interactive dev server)
+* `npm run android | ios | web` → platform-specific launch
+* `npm run deploy` → static web export & EAS deploy
+
+The repository currently uses **npm** (see `package-lock.json`). Follow this unless the team decides to migrate to `pnpm`.
+
+### Linting & Formatting
+
+* ESLint / Prettier are **not** configured yet. Add them in a separate PR if needed.
+
+## 10. Testing
+
+* No test setup is present; if you add tests, prefer [Jest](mdc:https:/jestjs.io) with React Native Testing Library, but keep the configuration minimal.
+
+## 11. Deployment Notes
+
+* Web builds output to a server environment (`app.json > web.output = "server"`).
+* Native builds & OTA updates are handled via EAS – see the `deploy` script.
+
+## 12. Environment Variables
+
+Per the project rule, **never read `.env` files programmatically**. Instead, document required variables in the README and ask maintainers to supply them.
+
+---
+
+### Checklist for New Features
+
+☐ Place new screens in `src/app` and components in `src/components`.<br/>
+☐ Use NativeWind utility classes and `cn()`.<br/>
+☐ Follow Reanimated best practices (`runOnJS`).<br/>
+☐ Validate any external data with `zod`.<br/>
+☐ Keep API routes stateless and streaming-ready.<br/>
+☐ Update this rule if you introduce significant new architecture.
