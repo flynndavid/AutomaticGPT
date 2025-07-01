@@ -1,0 +1,211 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 📚 Template Documentation Standards
+
+This rule ensures consistent, comprehensive documentation for all template features and guides AI agents to maintain high-quality documentation standards.
+
+## 🎯 Documentation Philosophy
+
+**Every feature MUST be documented** - This template serves as a foundation for other developers, so documentation is not optional but essential for template success.
+
+## 📁 Documentation Structure
+
+### Current Structure
+The documentation lives in [docs/](mdc:docs) with the following organization:
+
+```
+docs/
+├── FEATURES.md          # Feature status and overview
+├── SETUP.md            # Setup and configuration guide
+├── features/           # Individual feature documentation
+│   ├── auth/
+│   ├── chat/
+│   ├── navigation/
+│   └── storage/
+├── guides/             # Usage and tutorial guides
+├── api/               # API documentation
+└── deployment/        # Deployment guides
+```
+
+### Required Documentation Files
+
+**For every new feature, you MUST create:**
+
+1. **Feature Documentation** (`docs/features/{feature-name}/`)
+   - `README.md` - Overview and quick start
+   - `setup.md` - Configuration and installation
+   - `usage.md` - How to use the feature
+   - `troubleshooting.md` - Common issues and solutions
+   - `api.md` - API reference (if applicable)
+
+2. **Update Central Documentation**
+   - Update [docs/FEATURES.md](mdc:docs/FEATURES.md) with new feature status
+   - Update [docs/SETUP.md](mdc:docs/SETUP.md) if setup process changes
+
+## ✅ Documentation Requirements
+
+### When Creating New Features
+
+**ALWAYS do these steps when adding a new feature:**
+
+1. **Create Feature Directory**
+   ```bash
+   mkdir -p docs/features/{feature-name}
+   ```
+
+2. **Create Documentation Files**
+   - Use the templates in `docs/templates/` (create if missing)
+   - Include code examples from actual implementation
+   - Add environment variable documentation
+   - Document feature flags and configuration
+
+3. **Update Central Documentation**
+   - Add feature to [docs/FEATURES.md](mdc:docs/FEATURES.md) feature table
+   - Update setup instructions in [docs/SETUP.md](mdc:docs/SETUP.md)
+   - Add to any relevant troubleshooting guides
+
+### When Modifying Existing Features
+
+**ALWAYS update documentation when:**
+- Changing configuration options
+- Adding new functionality
+- Modifying environment variables
+- Updating dependencies
+- Fixing bugs that affect usage
+
+## 📝 Documentation Templates
+
+### Feature README Template
+
+```markdown
+# {Feature Name}
+
+## Overview
+Brief description of what this feature does and why it's useful.
+
+## Quick Start
+```bash
+# Installation and basic setup commands
+```
+
+## Configuration
+```bash
+# Environment variables
+EXPO_PUBLIC_ENABLE_{FEATURE}=true
+{FEATURE}_API_KEY=your_key_here
+```
+
+## Features
+- ✅ Feature 1
+- ✅ Feature 2
+- 🚧 Feature 3 (planned)
+
+## Usage
+Code examples and common use cases.
+
+## Troubleshooting
+Common issues and solutions.
+```
+
+### Feature Setup Template
+
+```markdown
+# {Feature Name} Setup
+
+## Prerequisites
+- List of requirements
+- Dependencies needed
+
+## Installation
+Step-by-step setup instructions
+
+## Configuration
+Detailed configuration options
+
+## Verification
+How to verify the feature is working correctly
+```
+
+## 🔧 Feature-Specific Documentation Standards
+
+### Authentication Features
+- Include security best practices
+- Document session management
+- Provide examples for protected routes
+- Reference [src/features/auth/](mdc:src/features/auth) implementation
+
+### Chat/AI Features
+- Document API usage and costs
+- Include rate limiting information
+- Provide customization examples
+- Reference [src/features/chat/](mdc:src/features/chat) implementation
+
+### UI/Theme Features
+- Include visual examples or screenshots
+- Document color schemes and customization
+- Provide accessibility notes
+- Reference [src/features/shared/](mdc:src/features/shared) implementation
+
+## 📊 Documentation Quality Standards
+
+### Writing Standards
+- **Clear and Concise**: Use simple language, avoid jargon
+- **Code Examples**: Include working code from the actual implementation
+- **Step-by-Step**: Break complex processes into numbered steps
+- **Error Handling**: Document common errors and solutions
+
+### Technical Standards
+- **Accuracy**: All code examples must be tested and working
+- **Completeness**: Cover all configuration options and use cases
+- **Maintenance**: Update when implementation changes
+- **Cross-References**: Link related documentation and code files
+
+## 🚨 Critical Documentation Rules
+
+### MUST DO:
+- **Create docs BEFORE merging** new features
+- **Test all code examples** in documentation
+- **Update feature status** in [docs/FEATURES.md](mdc:docs/FEATURES.md)
+- **Version control docs** with related code changes
+- **Reference actual code files** using `[filename](mdc:path/to/file)` format
+
+### MUST NOT DO:
+- **Never leave features undocumented** - even experimental ones need basic docs
+- **Don't create orphaned docs** - ensure all docs are linked from main guides
+- **Avoid outdated examples** - remove or update deprecated code examples
+- **Don't duplicate content** - link to existing docs instead of copying
+
+## 🔄 Documentation Maintenance
+
+### Regular Updates Needed:
+- When environment variables change
+- When feature flags are added/removed
+- When dependencies are updated
+- When new configuration options are added
+- When troubleshooting new issues
+
+### Documentation Review Checklist:
+- [ ] All code examples work with current implementation
+- [ ] Environment variables are up to date
+- [ ] Feature status is accurate in [docs/FEATURES.md](mdc:docs/FEATURES.md)
+- [ ] Setup instructions are complete
+- [ ] Troubleshooting covers recent issues
+- [ ] Cross-references are valid
+
+## 📚 Resources and References
+
+### Key Documentation Files:
+- [docs/FEATURES.md](mdc:docs/FEATURES.md) - Feature overview and status
+- [docs/SETUP.md](mdc:docs/SETUP.md) - Initial setup guide
+- [.env.example](mdc:.env.example) - Environment variable examples
+- [README.md](mdc:README.md) - Project overview
+
+### Implementation References:
+- [src/config/features.ts](mdc:src/config/features.ts) - Feature flag system
+- [src/config/index.ts](mdc:src/config/index.ts) - Configuration management
+- [app.json](mdc:app.json) - Expo configuration
+
+**Remember: Good documentation is what makes this template valuable to the community. Always prioritize clear, accurate, and helpful documentation for every feature you build.**

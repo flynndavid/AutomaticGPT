@@ -16,7 +16,7 @@ export function Chat() {
       <SafeAreaView className="flex-1 bg-background">
         <StatusBar
           barStyle={isDark ? 'light-content' : 'dark-content'}
-          backgroundColor={isDark ? '#000' : '#fff'}
+          backgroundColor={isDark ? '#0f0f11' : '#fafaf9'}
         />
         <View className="flex-1 items-center justify-center p-4">
           <Text className="text-red-500 text-center">{error.message}</Text>
@@ -29,7 +29,7 @@ export function Chat() {
     <SafeAreaView className="flex-1 bg-background">
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
-        backgroundColor={isDark ? '#000' : '#fff'}
+        backgroundColor={isDark ? '#0f0f11' : '#fafaf9'}
       />
       <ChatHeader />
 

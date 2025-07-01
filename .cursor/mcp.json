@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "Supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_f4ea2c202dd124d792fdef2853b80f591ab729de"
+      ],
+      "env": {
+        "SUPABASE_PROJECT_REF": "hjzkrzdlhhaxyptgkkhu"
+      }
+    },
+    "taskmaster-ai": {
+      "command": "npx",
+      "args": ["-y", "--package=task-master-ai", "task-master-ai"],
+      "env": {
+        "OPENAI_API_KEY": "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",
+        "ANTHROPIC_API_KEY": "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"
+      }
+    }
+  }
+}

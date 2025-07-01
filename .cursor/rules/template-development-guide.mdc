@@ -1,0 +1,142 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Template Development Guide
+
+## 🎯 Project End Goal
+This Expo project is being transformed into a **production-ready, public GitHub template** that developers can clone to quickly bootstrap modern mobile/web applications with authentication, storage, and advanced features.
+
+## 📋 Template Vision
+- **One-command setup**: `npx create-expo-app MyApp --template modern-expo-template`
+- **Modular architecture**: Features can be enabled/disabled via environment flags
+- **Production-ready**: Includes auth, storage, navigation, testing, and deployment
+- **Developer-friendly**: Comprehensive docs, interactive setup wizard, and automation
+- **Community-focused**: Easy to contribute, maintain, and customize
+
+## 🏗️ Current Architecture
+The project follows a **feature-based architecture** as defined in [app_template_configuration.md](mdc:app_template_configuration.md):
+
+```
+src/
+├── app/                    # Expo Router routes & API endpoints
+├── features/              # Feature-based organization
+│   ├── chat/              # Current chat feature (will expand)
+│   └── shared/            # Cross-feature shared code
+├── config/               # Application configuration
+├── lib/                  # Generic utilities
+└── types/                # Global TypeScript definitions
+```
+
+## 🚀 Template Implementation Phases
+
+### Phase 1: Foundation (PRIORITY)
+- Feature flag system via environment variables
+- Interactive setup wizard (`scripts/setup.js`)
+- GitHub template configuration
+- Comprehensive documentation structure
+
+### Phase 2: Authentication & User Management
+- Supabase integration with [src/lib/supabase.ts](mdc:src/lib/supabase.ts)
+- Auth screens and social providers
+- User profiles and session management
+
+### Phase 3: Navigation & Layout
+- Splash screen system
+- Drawer/sidebar navigation (configurable)
+- Tab navigation with deep linking
+- Onboarding flow
+
+### Phase 4: Storage & Advanced Features
+- File uploads and management
+- Offline support and caching
+- Push notifications
+- Analytics integration
+
+### Phase 5: Template Polish
+- Automated testing and CI/CD
+- Performance optimization
+- Community preparation and launch
+
+## 🔧 Key Development Principles
+
+### 1. **Feature Flags First**
+All new features should be controlled by environment variables:
+```typescript
+// src/config/features.ts
+export const FEATURES = {
+  AUTH: process.env.EXPO_PUBLIC_ENABLE_AUTH === 'true',
+  STORAGE: process.env.EXPO_PUBLIC_ENABLE_STORAGE === 'true',
+  // ... more features
+} as const;
+```
+
+### 2. **Configuration-Driven**
+Make everything customizable via environment variables:
+- App branding (name, colors, logos)
+- Feature enablement
+- Service integrations (Supabase, Vercel, etc.)
+
+### 3. **Template-Ready Structure**
+- Keep components under 150 lines
+- Use barrel exports (`index.ts`) for clean imports
+- Follow existing patterns in [src/features/chat/](mdc:src/features/chat)
+- Maintain 100% TypeScript coverage
+
+### 4. **Documentation-First**
+- Every feature needs setup documentation
+- Include code examples and configuration options
+- Provide migration guides for breaking changes
+
+## 📁 Critical Template Files
+
+### Current Foundation
+- [app_template_configuration.md](mdc:app_template_configuration.md) - Complete implementation guide
+- [src/config/index.ts](mdc:src/config/index.ts) - Centralized configuration
+- [package.json](mdc:package.json) - Dependencies and scripts
+- [app.json](mdc:app.json) - Expo configuration
+
+### Files to Create
+- `.env.example` - Template environment variables
+- `scripts/setup.js` - Interactive setup wizard
+- `docs/` - Comprehensive documentation
+- `TEMPLATE_README.md` - Template-specific README
+- `.github/` - Issue templates and workflows
+
+## 🔍 Development Guidelines
+
+### When Adding New Features
+1. **Feature Flag**: Add environment variable control
+2. **Documentation**: Update setup guides and feature docs
+3. **Configuration**: Make it customizable via config files
+4. **Testing**: Add tests for critical functionality
+5. **Examples**: Provide working examples and templates
+
+### When Modifying Existing Code
+1. **Backward Compatibility**: Don't break existing template users
+2. **Migration Path**: Provide clear upgrade instructions
+3. **Optional Changes**: Make enhancements opt-in when possible
+4. **Documentation**: Update all affected documentation
+
+### Code Standards
+- Follow existing patterns in [src/features/](mdc:src/features)
+- Use [src/lib/utils.ts](mdc:src/lib/utils.ts) for shared utilities
+- Maintain type safety with [src/types/](mdc:src/types)
+- Follow styling patterns with NativeWind (Tailwind)
+
+## 🎯 Success Metrics
+- **Setup Time**: < 5 minutes from clone to running app
+- **Feature Toggle**: All major features can be disabled
+- **Documentation**: Every feature has setup and usage docs
+- **Community**: Easy for developers to contribute and customize
+- **Maintenance**: Automated testing and dependency updates
+
+## 🚨 Important Considerations
+- **Never commit real API keys** - Use examples and templates
+- **Security first** - Include security best practices and guides
+- **Performance focus** - Bundle size optimization and lazy loading
+- **Accessibility** - Screen reader support and keyboard navigation
+- **Cross-platform** - iOS, Android, and Web compatibility
+
+This template will serve as the foundation for multiple future projects, so prioritize flexibility, documentation, and ease of use over quick implementation.

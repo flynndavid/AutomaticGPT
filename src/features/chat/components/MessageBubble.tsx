@@ -25,7 +25,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               key={part.type}
               style={{
                 body: {
-                  color: isUser ? '#ffffff' : isDark ? '#ffffff' : '#27272a',
+                  color: isUser ? '#ffffff' : isDark ? '#fafaf9' : '#27272a',
                   fontSize: 17,
                   lineHeight: 22,
                 },

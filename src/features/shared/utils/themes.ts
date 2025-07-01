@@ -2,35 +2,43 @@ import { vars } from 'nativewind';
 
 export const themes = {
   light: vars({
-    '--background': '255 255 255',
-    '--foreground': '0 0 0',
+    // Modern off-white background (warm, cream-tinted white)
+    '--background': '250 250 249',
+    '--foreground': '39 39 42',
+    // Card uses pure white for better contrast against off-white background
     '--card': '255 255 255',
-    '--card-foreground': '0 0 0',
+    '--card-foreground': '39 39 42',
     '--primary': '59 130 246',
     '--primary-foreground': '255 255 255',
-    '--secondary': '243 244 246',
-    '--secondary-foreground': '31 41 55',
-    '--muted': '249 250 251',
-    '--muted-foreground': '107 114 128',
-    '--border': '229 231 235',
-    '--input': '243 244 246',
-    '--accent': '243 244 246',
-    '--accent-foreground': '31 41 55',
+    // Adjusted secondary to work with new background
+    '--secondary': '245 245 244',
+    '--secondary-foreground': '39 39 42',
+    // Refined muted colors for better contrast
+    '--muted': '247 247 246',
+    '--muted-foreground': '115 115 115',
+    '--border': '231 229 228',
+    // Input uses a more contrasted light gray for better visibility
+    '--input': '241 241 240',
+    '--accent': '245 245 244',
+    '--accent-foreground': '39 39 42',
   }),
   dark: vars({
-    '--background': '0 0 0',
-    '--foreground': '255 255 255',
-    '--card': '26 26 26',
-    '--card-foreground': '255 255 255',
+    // Modern off-black background (warm, slightly purple-tinted dark)
+    '--background': '15 15 17',
+    '--foreground': '250 250 249',
+    // Card uses slightly lighter off-black for layering
+    '--card': '24 24 27',
+    '--card-foreground': '250 250 249',
     '--primary': '59 130 246',
     '--primary-foreground': '255 255 255',
-    '--secondary': '26 26 26',
-    '--secondary-foreground': '209 213 219',
-    '--muted': '26 26 26',
-    '--muted-foreground': '156 163 175',
-    '--border': '55 65 81',
-    '--input': '26 26 26',
-    '--accent': '26 26 26',
-    '--accent-foreground': '209 213 219',
+    // Adjusted secondary to complement new background
+    '--secondary': '30 30 34',
+    '--secondary-foreground': '212 212 216',
+    '--muted': '24 24 27',
+    '--muted-foreground': '161 161 170',
+    '--border': '60 60 67',
+    '--input': '30 30 34',
+    '--accent': '30 30 34',
+    '--accent-foreground': '212 212 216',
   }),
 };
