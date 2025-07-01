@@ -1,15 +1,25 @@
 import { Text, View, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardPaddingView, useTheme, Sidebar, useSidebar } from '@/features/shared';
-import { useChatController } from '../hooks/useChatController';
+import { useChatManager } from '../hooks/useChatManager';
 import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { EmptyState } from './EmptyState';
 import { InputBar } from './InputBar';
 
 export function Chat() {
-  const { messages, error, input, isLoading, handleInputChange, onSend, handleSuggestionPress } =
-    useChatController();
+  const {
+    messages,
+    error,
+    input,
+    isLoading,
+    handleInputChange,
+    onSend,
+    handleSuggestionPress,
+    currentConversationId,
+    handleConversationSelect,
+    handleNewConversation,
+  } = useChatManager();
   const { isDark } = useTheme();
   const sidebar = useSidebar();
 
@@ -55,9 +65,9 @@ export function Chat() {
       <Sidebar
         isOpen={sidebar.isOpen}
         onClose={sidebar.close}
-        appName="ChatGPT"
-        userName="Jane Smith"
-        userEmail="jane.smith@example.com"
+        appName="AI Assistant"
+        onConversationSelect={handleConversationSelect}
+        currentConversationId={currentConversationId}
       />
     </SafeAreaView>
   );

@@ -1,5 +1,4 @@
 import { ScrollView, Pressable, Text, View } from 'react-native';
-import { useTheme } from '@/features/shared';
 import { suggestionCardShadow } from '@/lib/styles';
 
 const suggestions = [
@@ -30,8 +29,6 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ onSuggestionPress }: EmptyStateProps) {
-  const { isDark } = useTheme();
-
   const handleSuggestionPress = (title: string, subtitle: string) => {
     const suggestionText = `${title} ${subtitle}`;
     onSuggestionPress?.(suggestionText);

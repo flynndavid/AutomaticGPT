@@ -1,388 +1,140 @@
-# ✨ Features Guide
-
-This document outlines all available features in the Expo Template, their current status, and how to use them.
+# Features Overview
 
-## 🎯 Overview
+This document provides an overview of all features implemented in the Expo template.
 
-The template is designed to be **modular and configurable**. You can enable or disable features via environment variables to keep your bundle size optimized and only include what you need.
+## ✅ Implemented Features
 
-## 📊 Feature Status
+### 🔐 Authentication & User Management
 
-### ✅ Currently Implemented
+- **Email/Password Authentication** - Secure user registration and login
+- **User Profiles** - Automatic profile creation with comprehensive user data
+  - Full name, email, phone number
+  - Username, avatar URL, website, bio
+  - Automatic timestamps (created_at, updated_at)
+- **Profile Management** - Update user profile information
+- **Session Management** - Persistent authentication state
+- **Password Reset** - Email-based password recovery
+- **Row Level Security** - Database-level security policies
 
-| Feature                | Description                         | Environment Variable                   | Status   |
-| ---------------------- | ----------------------------------- | -------------------------------------- | -------- |
-| 🤖 **AI Chat**         | OpenAI-powered chat interface       | `OPENAI_API_KEY`                       | ✅ Ready |
-| 🔐 **Authentication**  | Supabase auth with email/password   | `EXPO_PUBLIC_ENABLE_AUTH`              | ✅ Ready |
-| 🎓 **Onboarding**      | Welcome screens and user flow       | `EXPO_PUBLIC_ENABLE_ONBOARDING`        | ✅ Ready |
-| 🌅 **Splash Screen**   | App startup and branding screen     | `EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING` | ✅ Ready |
-| 🌓 **Dark Mode**       | Light/dark theme switching          | `EXPO_PUBLIC_ENABLE_DARK_MODE`         | ✅ Ready |
-| 📱 **Responsive UI**   | NativeWind (Tailwind) styling       | Built-in                               | ✅ Ready |
-| 🔄 **Hot Reload**      | Fast development experience         | Built-in                               | ✅ Ready |
-| ⚡ **Haptic Feedback** | Touch feedback on interactions      | `EXPO_PUBLIC_ENABLE_HAPTICS`           | ✅ Ready |
-| 🎭 **Animations**      | Smooth UI transitions               | `EXPO_PUBLIC_ENABLE_ANIMATIONS`        | ✅ Ready |
-| 🧪 **Testing**         | Jest + React Native Testing Library | Built-in                               | ✅ Ready |
-| 📦 **TypeScript**      | 100% type coverage                  | Built-in                               | ✅ Ready |
-| 🔍 **Code Quality**    | ESLint + Prettier + Husky           | Built-in                               | ✅ Ready |
+### 💬 AI Chat Interface
 
-### 🚧 Planned Features (Future Phases)
+- **Streaming Chat** - Real-time AI conversations using OpenAI GPT-4o
+- **Message History** - Persistent chat history with virtualized scrolling
+- **Voice Input** - Speech-to-text input (configurable)
+- **Tool Support** - AI can use tools and display structured responses
+- **Empty State** - Helpful suggestions for new conversations
 
-| Feature                   | Description          | Environment Variable             | Status     |
-| ------------------------- | -------------------- | -------------------------------- | ---------- |
-| **User Profiles**         | Profile management   | `EXPO_PUBLIC_ENABLE_PROFILE`     | 📋 Planned |
-| 📁 **File Storage**       | Upload/manage files  | `EXPO_PUBLIC_ENABLE_STORAGE`     | 📋 Planned |
-| 🔀 **Sidebar Navigation** | Drawer navigation    | `EXPO_PUBLIC_ENABLE_SIDEBAR`     | 📋 Planned |
-| � **SMS Authentication**  | Phone number sign in | `EXPO_PUBLIC_ENABLE_SMS_AUTH`    | 📋 Planned |
-| 🔍 **OAuth Providers**    | Google/Apple sign in | `EXPO_PUBLIC_ENABLE_GOOGLE_AUTH` | 📋 Planned |
-| 📊 **Analytics**          | Usage tracking       | `EXPO_PUBLIC_ENABLE_ANALYTICS`   | 📋 Planned |
-| 🔔 **Push Notifications** | Mobile notifications | `EXPO_PUBLIC_ENABLE_PUSH`        | 📋 Planned |
-| 🌐 **Realtime Features**  | Live data updates    | `EXPO_PUBLIC_ENABLE_REALTIME`    | 📋 Planned |
+### 🧭 Navigation & Layout
 
-## 🔧 Core Features
+- **File-based Routing** - Expo Router with TypeScript
+- **Authentication Flow** - Separate auth and app layouts
+- **Responsive Design** - Works on mobile, tablet, and web
+- **Theme Support** - Light/dark theme with system preference detection
+- **Sidebar Navigation** - Collapsible sidebar with theme toggle
 
-### 🤖 AI Chat Interface
+### 🎨 UI & Styling
 
-**What it does:** Provides a full-featured chat interface powered by OpenAI's GPT models.
+- **NativeWind** - Tailwind CSS for React Native
+- **Consistent Design System** - Unified color scheme and typography
+- **Animations** - Smooth transitions with Reanimated v3
+- **Loading States** - Proper loading indicators throughout the app
+- **Error Handling** - User-friendly error messages
 
-**Configuration:**
+### 🛠️ Development Experience
 
-```bash
-# Required
-OPENAI_API_KEY=your_openai_api_key_here
+- **TypeScript** - 100% type coverage with strict configuration
+- **ESLint + Prettier** - Code quality and formatting
+- **Pre-commit Hooks** - Automated code quality checks
+- **Testing Setup** - Jest with React Native Testing Library
+- **CI/CD Pipeline** - GitHub Actions for automated testing
 
-# Optional
-EXPO_PUBLIC_MAX_MESSAGES=100
-EXPO_PUBLIC_DEFAULT_TEMPERATURE=0.7
-EXPO_PUBLIC_MAX_TOKENS=2000
-EXPO_PUBLIC_STREAMING_ENABLED=true
-```
+## 🚧 In Progress
 
-**Features:**
+### 📱 Onboarding Flow
 
-- ✅ Streaming responses
-- ✅ Message history
-- ✅ Markdown rendering
-- ✅ Error handling
-- ✅ Loading states
-- ✅ Virtualized list for performance
+- **Welcome Screens** - Multi-step onboarding with slides
+- **Feature Introduction** - Showcase key app capabilities
+- **Profile Setup** - Guide users through initial profile completion
 
-**Usage:**
-The chat interface is automatically available on the home screen. Users can start chatting immediately after providing an OpenAI API key.
+### 🎭 Splash Screen
 
-### 🔐 Authentication System
+- **Custom Splash** - Branded loading experience
+- **Asset Preloading** - Optimize app startup time
 
-**What it does:** Complete authentication system with Supabase backend.
+## 📋 Planned Features
 
-**Configuration:**
+### 🔒 Enhanced Authentication
 
-```bash
-# Enable authentication
-EXPO_PUBLIC_ENABLE_AUTH=true
+- **Social Login** - Google, Apple, GitHub authentication
+- **Email Verification** - Confirm email addresses
+- **Two-Factor Authentication** - Enhanced security options
+- **Profile Completion** - Guided profile setup flow
 
-# Supabase connection (required)
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+### 📊 User Dashboard
 
-# Auth methods
-EXPO_PUBLIC_ENABLE_EMAIL_AUTH=true
-EXPO_PUBLIC_ENABLE_SMS_AUTH=false
-EXPO_PUBLIC_ENABLE_GOOGLE_AUTH=false
-EXPO_PUBLIC_ENABLE_APPLE_AUTH=false
-```
+- **Profile Management** - Comprehensive profile editing
+- **Usage Analytics** - Personal usage statistics
+- **Settings Panel** - App preferences and configuration
 
-**Features:**
+### 🗄️ Data Management
 
-- ✅ Email/password authentication
-- ✅ User registration and login
-- ✅ Session management and persistence
-- ✅ Protected routes
-- ✅ Auto-redirect based on auth state
-- ✅ Form validation and error handling
-- ✅ User profile creation
+- **Offline Support** - Local data caching and sync
+- **File Uploads** - Profile images and document handling
+- **Data Export** - User data portability
 
-**Usage:**
-When enabled, users must authenticate before accessing the main app. The system automatically handles routing between auth and app screens.
+### 🔔 Notifications
 
-### 🎓 Onboarding Flow
+- **Push Notifications** - Real-time updates
+- **In-app Notifications** - Status updates and alerts
+- **Notification Preferences** - User-controlled notification settings
 
-**What it does:** Guided introduction for new users with feature highlights.
+### 🌐 Advanced Features
 
-**Configuration:**
+- **Multi-language Support** - Internationalization (i18n)
+- **Accessibility** - Screen reader and keyboard navigation
+- **Performance Optimization** - Bundle splitting and lazy loading
+- **Analytics Integration** - User behavior tracking
 
-```bash
-# Enable onboarding
-EXPO_PUBLIC_ENABLE_ONBOARDING=true
+## 🏗️ Architecture Features
 
-# Enable splash screen
-EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING=true
-```
+### 📁 Project Structure
 
-**Features:**
+- **Feature-based Architecture** - Organized by functionality
+- **Barrel Exports** - Clean import paths
+- **Type Safety** - Comprehensive TypeScript definitions
+- **Configuration Management** - Centralized app configuration
 
-- ✅ Custom splash screen with app branding
-- ✅ 3-slide onboarding carousel
-- ✅ Skippable introduction
-- ✅ Smooth page transitions
-- ✅ Progress indicators
-- ✅ Customizable slide content
+### 🔧 Development Tools
 
-**Usage:**
-New users see a splash screen followed by onboarding slides explaining key features. Users can skip onboarding at any time.
+- **Environment Management** - Multiple environment support
+- **Hot Reloading** - Fast development iteration
+- **Debug Tools** - Comprehensive debugging setup
+- **Documentation** - Extensive feature documentation
 
-### 🌓 Dark Mode Support
+### 🚀 Deployment
 
-**What it does:** Provides system-aware dark/light theme switching.
+- **Cross-platform Builds** - iOS, Android, and Web
+- **Environment Variables** - Secure configuration management
+- **CI/CD Integration** - Automated build and deployment
+- **Performance Monitoring** - Real-time app performance tracking
 
-**Configuration:**
+## 🎯 Template Goals
 
-```bash
-EXPO_PUBLIC_ENABLE_DARK_MODE=true
-EXPO_PUBLIC_THEME_MODE=system  # light, dark, or system
-```
+This template is designed to be:
 
-**Features:**
+- **Production-ready** - Suitable for real-world applications
+- **Scalable** - Architecture supports growth and complexity
+- **Maintainable** - Clean code and comprehensive documentation
+- **Customizable** - Easy to modify and extend
+- **Developer-friendly** - Great developer experience with modern tools
 
-- ✅ System theme detection
-- ✅ Manual theme toggle
-- ✅ Consistent styling across all components
-- ✅ Smooth transitions
+## 📖 Documentation
 
-**Usage:**
-Theme toggles are available in the header. The app respects system theme preferences by default.
+Each feature includes comprehensive documentation:
 
-### 📱 Responsive Design
+- Setup and configuration guides
+- Usage examples and best practices
+- Troubleshooting and common issues
+- API references and type definitions
 
-**What it does:** Provides a consistent, responsive UI across iOS, Android, and Web.
-
-**Technology:** Built with NativeWind (Tailwind CSS for React Native)
-
-**Features:**
-
-- ✅ Unified styling system
-- ✅ Platform-specific adaptations
-- ✅ Responsive breakpoints
-- ✅ Accessibility support
-
-### ⚡ Performance Optimizations
-
-**What it does:** Ensures smooth performance across all platforms.
-
-**Features:**
-
-- ✅ FlatList virtualization for large lists
-- ✅ React.memo for component optimization
-- ✅ Safe animations with Reanimated
-- ✅ Bundle splitting and lazy loading
-
-**Configuration:**
-
-```bash
-EXPO_PUBLIC_ENABLE_ANIMATIONS=true
-EXPO_PUBLIC_ANIMATION_DURATION=300
-EXPO_PUBLIC_ENABLE_HAPTICS=true
-```
-
-## 🔮 Planned Features
-
-### 🔐 Authentication System
-
-**Planned for:** Phase 2
-
-**What it will do:** Complete authentication system with Supabase backend.
-
-**Planned Features:**
-
-- Email/password authentication
-- Social logins (Google, Apple)
-- Session management
-- Protected routes
-- Password reset
-- Email verification
-
-**Configuration:**
-
-```bash
-EXPO_PUBLIC_ENABLE_AUTH=true
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-```
-
-### 👤 User Profile Management
-
-**Planned for:** Phase 2
-
-**What it will do:** User profile screens and management.
-
-**Planned Features:**
-
-- Profile creation/editing
-- Avatar uploads
-- Settings management
-- Account deletion
-- Privacy controls
-
-### 📁 File Storage & Uploads
-
-**Planned for:** Phase 4
-
-**What it will do:** Complete file management system.
-
-**Planned Features:**
-
-- Image/file uploads
-- File organization
-- Sharing capabilities
-- Storage quotas
-- Multiple file formats
-
-### 🎓 User Onboarding
-
-**Planned for:** Phase 3
-
-**What it will do:** Guided introduction for new users.
-
-**Planned Features:**
-
-- Welcome screens
-- Feature tour
-- Setup assistance
-- Progress tracking
-- Skip options
-
-## 🔄 Feature Configuration
-
-### Enabling Features
-
-Features are controlled via environment variables in your `.env.local` file:
-
-```bash
-# Enable a feature
-EXPO_PUBLIC_ENABLE_FEATURE_NAME=true
-
-# Disable a feature
-EXPO_PUBLIC_ENABLE_FEATURE_NAME=false
-```
-
-### Feature Dependencies
-
-Some features depend on others:
-
-```
-Authentication (enableAuth)
-  ├── Profile Management (enableProfile) ⚠️ requires enableAuth
-  └── Social Auth (enableSocialAuth) ⚠️ requires enableAuth
-
-Storage (enableStorage)
-  └── File Uploads (enableFileUploads) ⚠️ requires enableStorage
-
-Navigation
-  ├── Sidebar (enableSidebar) ⚠️ conflicts with enableTabNavigation
-  └── Tab Navigation (enableTabNavigation) ⚠️ conflicts with enableSidebar
-```
-
-### Validation
-
-The template automatically validates feature dependencies and will warn you about conflicts:
-
-```bash
-npm run start
-# Console output:
-# [WARN] enableProfile requires enableAuth to be enabled
-```
-
-## 🧪 Testing Features
-
-### Running Tests
-
-```bash
-# Run all tests
-npm run test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests in watch mode
-npm run test:watch
-```
-
-### Test Coverage
-
-Current test coverage:
-
-- ✅ Core components
-- ✅ Hooks and utilities
-- ✅ Configuration system
-- ✅ Feature flag logic
-
-### Writing Tests
-
-Tests are co-located with components:
-
-```
-src/features/chat/components/
-├── MessageBubble.tsx
-└── __tests__/
-    └── MessageBubble.test.tsx
-```
-
-## 🚀 Using Features in Your Code
-
-### Feature Flag Checks
-
-```typescript
-import { FEATURES, isFeatureEnabled } from '@/config';
-
-// Check if a feature is enabled
-if (FEATURES.enableAuth) {
-  // Show auth-related UI
-}
-
-// Using the utility function
-if (isFeatureEnabled('enableDarkMode')) {
-  // Dark mode specific logic
-}
-```
-
-### Conditional Rendering
-
-```typescript
-import { FEATURES } from '@/config';
-
-export default function App() {
-  return (
-    <View>
-      {FEATURES.enableAuth && <AuthProvider>}
-        <MainContent />
-      {FEATURES.enableAuth && </AuthProvider>}
-    </View>
-  );
-}
-```
-
-### Configuration Access
-
-```typescript
-import { config } from '@/config';
-
-// Access branding configuration
-const primaryColor = config.branding.colors.primary;
-const appName = config.branding.appName;
-
-// Access feature flags
-const isDarkModeEnabled = config.features.enableDarkMode;
-```
-
-## 📚 Next Steps
-
-1. **Explore Current Features**: Try out the AI chat and theme switching
-2. **Customize Configuration**: Adjust settings in your `.env.local`
-3. **Stay Updated**: Watch for new feature releases
-4. **Contribute**: Help us build the planned features!
-
-## 🤝 Contributing
-
-Interested in helping build new features? Check out our [contributing guidelines](../CONTRIBUTING.md) and the [roadmap](../roadmap/) for upcoming work.
-
----
-
-**Questions?** Create an issue using our [Setup Help template](../.github/ISSUE_TEMPLATE/setup_help.md)!
+See the `docs/features/` directory for detailed feature documentation.

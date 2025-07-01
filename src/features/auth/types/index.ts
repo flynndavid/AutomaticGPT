@@ -3,7 +3,7 @@
  * Type definitions for authentication functionality
  */
 
-import type { SupabaseSession, SupabaseUser } from '@/lib/supabase';
+import type { SupabaseSession, SupabaseUser, Profile } from '@/lib/supabase';
 
 /**
  * Authentication state
@@ -14,6 +14,7 @@ export interface AuthState {
   user: SupabaseUser | null;
   session: SupabaseSession | null;
   error: string | null;
+  profile: Profile | null;
 }
 
 /**
@@ -22,7 +23,7 @@ export interface AuthState {
 export interface AuthContextType extends AuthState {
   // Authentication actions
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, profileData?: ProfileCreateData) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   clearError: () => void;
@@ -49,6 +50,19 @@ export interface SignUpData {
   email: string;
   password: string;
   confirmPassword: string;
+  fullName: string;
+}
+
+/**
+ * Profile creation data for signup
+ */
+export interface ProfileCreateData {
+  full_name: string;
+  email: string;
+  username?: string;
+  avatar_url?: string;
+  website?: string;
+  phone?: string;
 }
 
 /**

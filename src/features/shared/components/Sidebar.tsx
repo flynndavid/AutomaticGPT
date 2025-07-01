@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, Pressable, ScrollView, Image } from 'react-native';
+import { Text, View, Pressable, ScrollView, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
@@ -9,8 +9,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../hooks/useTheme';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useConversations } from '@/features/chat/hooks/useConversations';
+import { ConversationShareModal } from '@/features/chat/components/ConversationShareModal';
+import { AnalyticsDashboard } from '@/features/chat/components/AnalyticsDashboard';
 import { animationConfigs } from '@/lib/animations';
 import { config } from '@/config';
+import { FEATURES } from '@/config/features';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -19,22 +24,17 @@ interface SidebarProps {
   userName?: string;
   userEmail?: string;
   userAvatar?: string;
+  onConversationSelect?: (conversationId: string) => void;
+  currentConversationId?: string;
 }
 
-// Dummy data for navigation and chat history
+// Navigation items
 const navigationItems = [
-  { id: 'chat', label: 'Chat', icon: 'chatbubbles-outline' },
+  { id: 'chat', label: 'New Chat', icon: 'add-outline' },
+  { id: 'analytics', label: 'Analytics', icon: 'analytics-outline' },
   { id: 'documents', label: 'Documents', icon: 'document-text-outline' },
   { id: 'memories', label: 'Memories', icon: 'library-outline' },
   { id: 'connections', label: 'Connections', icon: 'people-outline' },
-];
-
-const chatHistory = [
-  { id: '1', title: 'React Native Performance Tips', timestamp: '2 hours ago' },
-  { id: '2', title: 'TypeScript Best Practices', timestamp: '1 day ago' },
-  { id: '3', title: 'Building a Chat App', timestamp: '3 days ago' },
-  { id: '4', title: 'Expo Router Navigation', timestamp: '1 week ago' },
-  { id: '5', title: 'Animation with Reanimated', timestamp: '2 weeks ago' },
 ];
 
 const profileMenuItems = [
@@ -45,6 +45,20 @@ const profileMenuItems = [
   { id: 'logout', label: 'Log Out', icon: 'log-out-outline' },
 ];
 
+// Format timestamp for display
+const formatTimestamp = (timestamp: string): string => {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+
+  if (diffInMinutes < 1) return 'Just now';
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+  if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}d ago`;
+  if (diffInMinutes < 43200) return `${Math.floor(diffInMinutes / 10080)}w ago`;
+  return date.toLocaleDateString();
+};
+
 export function Sidebar({
   isOpen,
   onClose,
@@ -52,14 +66,29 @@ export function Sidebar({
   userName = 'John Doe',
   userEmail = 'john.doe@example.com',
   userAvatar,
+  onConversationSelect,
+  currentConversationId,
 }: SidebarProps) {
   const { isDark, toggleTheme } = useTheme();
+  const { user, signOut } = useAuth();
+  const { conversations, loading, createConversation, deleteConversation, archiveConversation } =
+    useConversations();
   const insets = useSafeAreaInsets();
   const translateX = useSharedValue(isOpen ? 0 : -300);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  const [selectedConversationForShare, setSelectedConversationForShare] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const [showAnalyticsDashboard, setShowAnalyticsDashboard] = useState(false);
 
   // Use app name from config if not provided as prop
   const displayAppName = appName || config.branding.appName;
+
+  // Use authenticated user data if available
+  const displayUserName = user?.email?.split('@')[0] || userName;
+  const displayUserEmail = user?.email || userEmail;
 
   // Animation styles
   const sidebarStyle = useAnimatedStyle(() => ({
@@ -83,18 +112,107 @@ export function Sidebar({
     onClose();
   };
 
-  const handleNavPress = (itemId: string) => {
-    console.log(`Navigate to: ${itemId}`);
-    // TODO: Implement navigation
+  const handleNavPress = async (itemId: string) => {
+    if (itemId === 'chat') {
+      // Create new conversation
+      setIsCreatingConversation(true);
+      try {
+        const newConversation = await createConversation();
+        if (newConversation && onConversationSelect) {
+          onConversationSelect(newConversation.id);
+          onClose();
+        }
+      } catch (error) {
+        console.error('Failed to create conversation:', error);
+        Alert.alert('Error', 'Failed to create new conversation');
+      } finally {
+        setIsCreatingConversation(false);
+      }
+    } else if (itemId === 'analytics') {
+      setShowAnalyticsDashboard(true);
+    } else {
+      console.log(`Navigate to: ${itemId}`);
+      // TODO: Implement navigation for other items
+    }
   };
 
-  const handleChatPress = (chatId: string) => {
-    console.log(`Open chat: ${chatId}`);
-    // TODO: Implement chat loading
+  const handleConversationPress = (conversationId: string) => {
+    if (onConversationSelect) {
+      onConversationSelect(conversationId);
+      onClose();
+    }
+  };
+
+  const handleConversationLongPress = (conversationId: string, title: string) => {
+    Alert.alert('Conversation Options', `What would you like to do with "${title}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Share',
+        onPress: () => {
+          setSelectedConversationForShare({ id: conversationId, title });
+        },
+      },
+      {
+        text: 'Archive',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await archiveConversation(conversationId);
+          } catch (error) {
+            console.error('Failed to archive conversation:', error);
+            Alert.alert('Error', 'Failed to archive conversation');
+          }
+        },
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          Alert.alert(
+            'Delete Conversation',
+            'Are you sure you want to delete this conversation? This action cannot be undone.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: async () => {
+                  try {
+                    await deleteConversation(conversationId);
+                  } catch (error) {
+                    console.error('Failed to delete conversation:', error);
+                    Alert.alert('Error', 'Failed to delete conversation');
+                  }
+                },
+              },
+            ]
+          );
+        },
+      },
+    ]);
   };
 
   const handleProfilePress = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
+  };
+
+  const handleSignOut = async () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await signOut();
+            onClose();
+          } catch (error) {
+            console.error('Sign out error:', error);
+            Alert.alert('Error', 'Failed to sign out. Please try again.');
+          }
+        },
+      },
+    ]);
   };
 
   const handleProfileMenuPress = (itemId: string) => {
@@ -102,6 +220,9 @@ export function Sidebar({
 
     if (itemId === 'theme') {
       toggleTheme();
+    } else if (itemId === 'logout' && FEATURES.enableAuth) {
+      handleSignOut();
+      return;
     }
 
     setIsProfileMenuOpen(false);
@@ -135,7 +256,6 @@ export function Sidebar({
             width: 300,
             zIndex: 999,
             paddingTop: insets.top,
-            paddingBottom: insets.bottom,
           },
         ]}
         className="bg-card border-r border-border"
@@ -161,51 +281,103 @@ export function Sidebar({
                 key={item.id}
                 onPress={() => handleNavPress(item.id)}
                 className="flex-row items-center px-6 py-3 active:bg-muted"
+                disabled={item.id === 'chat' && isCreatingConversation}
               >
                 <Ionicons name={item.icon as any} size={20} color={isDark ? '#9ca3af' : '#666'} />
-                <Text className="ml-3 text-base text-foreground">{item.label}</Text>
+                <Text className="ml-3 text-sm font-medium text-foreground">{item.label}</Text>
+                {item.id === 'chat' && isCreatingConversation && (
+                  <Text className="ml-auto text-xs text-muted-foreground">Creating...</Text>
+                )}
               </Pressable>
             ))}
           </View>
 
           {/* Chat History Section */}
-          <View className="py-4">
+          <View className="py-4 flex-1">
             <Text className="text-sm font-semibold text-muted-foreground px-6 mb-3 uppercase tracking-wider">
-              Recent Chats
+              Conversations
             </Text>
-            {chatHistory.map((chat) => (
-              <Pressable
-                key={chat.id}
-                onPress={() => handleChatPress(chat.id)}
-                className="px-6 py-3 active:bg-muted"
-              >
-                <Text className="text-sm font-medium text-foreground mb-1" numberOfLines={1}>
-                  {chat.title}
+
+            {loading ? (
+              <View className="px-6 py-4">
+                <Text className="text-sm text-muted-foreground">Loading conversations...</Text>
+              </View>
+            ) : conversations.length === 0 ? (
+              <View className="px-6 py-4">
+                <Text className="text-sm text-muted-foreground">No conversations yet</Text>
+                <Text className="text-xs text-muted-foreground mt-1">
+                  Start a new chat to begin
                 </Text>
-                <Text className="text-xs text-muted-foreground">{chat.timestamp}</Text>
-              </Pressable>
-            ))}
+              </View>
+            ) : (
+              conversations.map((conversation) => (
+                <Pressable
+                  key={conversation.id}
+                  onPress={() => handleConversationPress(conversation.id)}
+                  onLongPress={() =>
+                    handleConversationLongPress(conversation.id, conversation.title)
+                  }
+                  className={`px-6 py-3 active:bg-muted ${
+                    currentConversationId === conversation.id ? 'bg-muted' : ''
+                  }`}
+                >
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-1 mr-2">
+                      <Text className="text-sm font-medium text-foreground mb-1" numberOfLines={1}>
+                        {conversation.title}
+                      </Text>
+                      {conversation.last_message_preview && (
+                        <Text className="text-xs text-muted-foreground mb-1" numberOfLines={1}>
+                          {conversation.last_message_preview}
+                        </Text>
+                      )}
+                      <View className="flex-row items-center justify-between">
+                        <Text className="text-xs text-muted-foreground">
+                          {conversation.last_message_at
+                            ? formatTimestamp(conversation.last_message_at)
+                            : formatTimestamp(conversation.updated_at)}
+                        </Text>
+                        <Text className="text-xs text-muted-foreground">
+                          {conversation.message_count} msg
+                          {conversation.message_count !== 1 ? 's' : ''}
+                        </Text>
+                      </View>
+                    </View>
+                    {currentConversationId === conversation.id && (
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={16}
+                        color={isDark ? '#3b82f6' : '#2563eb'}
+                      />
+                    )}
+                  </View>
+                </Pressable>
+              ))
+            )}
           </View>
         </ScrollView>
 
         {/* User Profile Section - Sticky at bottom */}
-        <View className="bg-card">
+        <View
+          className="bg-card rounded-t-3xl shadow-lg border-t border-border/10"
+          style={{ paddingBottom: insets.bottom }}
+        >
           <Pressable onPress={handleProfilePress} className="flex-row items-center px-6 py-4">
             <View className="w-10 h-10 rounded-full bg-primary items-center justify-center mr-3">
               {userAvatar ? (
                 <Image source={{ uri: userAvatar }} className="w-10 h-10 rounded-full" />
               ) : (
                 <Text className="text-primary-foreground font-semibold">
-                  {userName.charAt(0).toUpperCase()}
+                  {displayUserName.charAt(0).toUpperCase()}
                 </Text>
               )}
             </View>
             <View className="flex-1">
-              <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-                {userName}
+              <Text className="text-sm font-medium text-foreground" numberOfLines={1}>
+                {displayUserName}
               </Text>
-              <Text className="text-xs text-muted-foreground" numberOfLines={1}>
-                {userEmail}
+              <Text className="text-sm text-muted-foreground" numberOfLines={1}>
+                {displayUserEmail}
               </Text>
             </View>
             <Ionicons
@@ -225,7 +397,7 @@ export function Sidebar({
                   className="flex-row items-center px-6 py-3 active:bg-muted"
                 >
                   <Ionicons name={item.icon as any} size={18} color={isDark ? '#9ca3af' : '#666'} />
-                  <Text className="ml-3 text-sm text-foreground">
+                  <Text className="ml-3 text-sm font-medium text-foreground">
                     {item.label}
                     {item.id === 'theme' && (
                       <Text className="text-muted-foreground"> ({isDark ? 'Dark' : 'Light'})</Text>
@@ -237,6 +409,22 @@ export function Sidebar({
           )}
         </View>
       </Animated.View>
+
+      {/* Conversation Share Modal */}
+      {selectedConversationForShare && (
+        <ConversationShareModal
+          visible={!!selectedConversationForShare}
+          onClose={() => setSelectedConversationForShare(null)}
+          conversationId={selectedConversationForShare.id}
+          conversationTitle={selectedConversationForShare.title}
+        />
+      )}
+
+      {/* Analytics Dashboard */}
+      <AnalyticsDashboard
+        visible={showAnalyticsDashboard}
+        onClose={() => setShowAnalyticsDashboard(false)}
+      />
     </>
   );
 }

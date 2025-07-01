@@ -2,26 +2,48 @@ import { useEffect, useState } from 'react';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 
 interface UseSplashScreenOptions {
-  minDisplayTime?: number;
-  onReady?: () => void;
+  minimumDuration?: number;
+  onComplete?: () => void;
 }
 
-export function useSplashScreen({ minDisplayTime = 2000, onReady }: UseSplashScreenOptions = {}) {
+export function useSplashScreen({
+  minimumDuration = 2000,
+  onComplete,
+}: UseSplashScreenOptions = {}) {
   const [isReady, setIsReady] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    // Keep the splash screen visible while we fetch resources
-    ExpoSplashScreen.preventAutoHideAsync();
+    const initializeApp = async () => {
+      // Prevent auto-hide while we're loading
+      await ExpoSplashScreen.preventAutoHideAsync();
 
-    // Simulate app initialization
-    const timer = setTimeout(async () => {
-      setIsReady(true);
-      await ExpoSplashScreen.hideAsync();
-      onReady?.();
-    }, minDisplayTime);
+      // Simulate app initialization (fonts, assets, etc.)
+      // In a real app, you'd load actual resources here
+      const startTime = Date.now();
 
-    return () => clearTimeout(timer);
-  }, [minDisplayTime, onReady]);
+      // Your app initialization logic here
+      // await loadFonts();
+      // await loadAssets();
+      // await checkAuthState();
 
-  return { isReady };
+      // Ensure minimum duration is met
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minimumDuration - elapsedTime);
+
+      setTimeout(async () => {
+        setIsReady(true);
+        setIsVisible(false);
+        await ExpoSplashScreen.hideAsync();
+        onComplete?.();
+      }, remainingTime);
+    };
+
+    initializeApp();
+  }, [minimumDuration, onComplete]);
+
+  return {
+    isReady,
+    isVisible,
+  };
 }

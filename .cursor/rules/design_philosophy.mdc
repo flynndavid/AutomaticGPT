@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Design Philosophy: "Modern Warm Minimalism"
+
+Your app follows a sophisticated, warm minimalist design with these key
+characteristics:
+
+🎨 Color Strategy
+
+- Warm Palettes: Cream-tinted whites (250,250,249) and purple-tinted darks
+(15,15,17)
+- High Contrast Layering: Pure white cards against off-white backgrounds
+- Consistent Brand Color: Blue-500 (#3b82f6) across all themes
+- Thoughtful Grays: Carefully chosen muted colors for accessibility
+
+📱 Mobile-First Typography
+
+- Enhanced Readability: Larger font sizes (17px base instead of 16px)
+- Optimal Line Height: 24px line-height for comfortable reading
+- Semantic Hierarchy: Clear distinction between headers, body, and labels
+
+🏗️ Layout Principles
+- Bottom-Heavy UI: Key actions placed at bottom for thumb accessibility
+- Generous Spacing: 16px-24px padding for comfortable touch targets
+- Rounded Corners: Consistent 8px-16px border radius for modern feel
+- Platform-Aware: Different shadow/elevation systems per platform
+
+🎬 Animation Style
+
+- Subtle & Smooth: 200-300ms timing with easing
+- Context-Aware: FadeIn for messages, Layout transitions for dynamic content
+- Performance-First: Reanimated v3 with proper worklet optimization
+

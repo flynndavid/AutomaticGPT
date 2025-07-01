@@ -2,27 +2,26 @@ export interface OnboardingSlide {
   id: string;
   title: string;
   description: string;
-  image?: any; // Image source
-  backgroundColor?: string;
+  icon: string;
 }
 
 export const defaultSlides: OnboardingSlide[] = [
   {
     id: '1',
-    title: 'Welcome to MyApp',
-    description: 'Your AI-powered assistant for everything',
-    backgroundColor: '#3b82f6',
+    title: 'Welcome to Automatic ExpoGPT',
+    description: 'Your intelligent assistant powered by advanced AI technology',
+    icon: '🚀',
   },
   {
     id: '2',
-    title: 'Smart Conversations',
-    description: 'Chat naturally with advanced AI technology',
-    backgroundColor: '#8b5cf6',
+    title: 'Natural Conversations',
+    description: 'Chat naturally and get intelligent responses tailored to your needs',
+    icon: '💬',
   },
   {
     id: '3',
-    title: 'Get Started',
-    description: 'Sign up or log in to begin your journey',
-    backgroundColor: '#10b981',
+    title: 'Ready to Begin',
+    description: 'Sign in to start your journey with AI-powered assistance',
+    icon: '✨',
   },
 ];

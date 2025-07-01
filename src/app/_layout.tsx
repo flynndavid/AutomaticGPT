@@ -1,47 +1,82 @@
 import '../global.css';
 import '@/utils/fetch-polyfill';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 import { SplashScreen } from '@/features/splash';
-import { AuthProvider } from '@/features/auth';
-import { ThemeProvider } from '@/features/shared';
-import { FEATURES } from '@/config/features';
+import { AuthProvider, useAuth } from '@/features/auth';
+import { ThemeProvider, ErrorAlert, useSplashManager } from '@/features/shared';
+import { screenTransitions } from '@/lib/animations';
 
 export { ErrorBoundary } from 'expo-router';
 
 // Keep the splash screen visible while we fetch resources
 ExpoSplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const [isReady, setIsReady] = useState(false);
+function RootLayoutNav() {
+  const { error, clearError } = useAuth();
+  const { shouldShowSplash, setAppReady } = useSplashManager();
 
   useEffect(() => {
     // Simulate app initialization
     const initializeApp = async () => {
       // Add any initialization logic here (fonts, etc.)
       setTimeout(async () => {
-        setIsReady(true);
+        setAppReady(true);
+        // Always hide the native splash once React is ready
         await ExpoSplashScreen.hideAsync();
-      }, 2000);
+      }, 300); // Reduced from 1500ms to 300ms for faster transitions
     };
 
     initializeApp();
-  }, []);
+  }, [setAppReady]);
 
-  if (!isReady && FEATURES.enableSplashOnboarding) {
-    return <SplashScreen appName="MyApp" />;
+  // Show splash screen if enabled and conditions require it
+  if (shouldShowSplash) {
+    return <SplashScreen appName="Automatic ExpoGPT" />;
   }
 
   return (
+    <>
+      {error && (
+        <ErrorAlert
+          error={error}
+          onDismiss={clearError}
+          title="Authentication Error"
+          showAlert={true}
+        />
+      )}
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="index"
+          options={{
+            animationTypeForReplace: 'push',
+            ...screenTransitions.fadeIn,
+          }}
+        />
+        <Stack.Screen
+          name="(auth)"
+          options={{
+            ...screenTransitions.slideFromRight,
+          }}
+        />
+        <Stack.Screen
+          name="(app)"
+          options={{
+            ...screenTransitions.slideFromRight,
+          }}
+        />
+      </Stack>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <ThemeProvider>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(app)" />
-          <Stack.Screen name="index" />
-        </Stack>
+        <RootLayoutNav />
       </AuthProvider>
     </ThemeProvider>
   );

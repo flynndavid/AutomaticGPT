@@ -8,11 +8,16 @@ interface OnboardingIndicatorProps {
 
 export function OnboardingIndicator({ count, currentIndex }: OnboardingIndicatorProps) {
   return (
-    <View className="flex-row justify-center space-x-2">
+    <View className="flex-row justify-center items-center space-x-2">
       {[...Array(count)].map((_, index) => (
         <View
           key={index}
-          className={`w-2 h-2 rounded-full ${index === currentIndex ? 'bg-white' : 'bg-white/30'}`}
+          className={`h-2 rounded-full transition-all duration-300 ${
+            index === currentIndex ? 'bg-primary w-8' : 'bg-muted-foreground w-2'
+          }`}
+          style={{
+            opacity: index === currentIndex ? 1 : 0.4,
+          }}
         />
       ))}
     </View>

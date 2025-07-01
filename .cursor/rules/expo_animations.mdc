@@ -1,0 +1,200 @@
+---
+description: This rule covers animation patterns, navigation transitions, and best practices for Expo Router based on real implementation experience.
+globs: 
+alwaysApply: false
+---
+# Expo Router Animation & Navigation Patterns
+
+This rule covers animation patterns, navigation transitions, and best practices for Expo Router based on real implementation experience.
+
+## 🎯 Core Animation Principles
+
+### **Built-in Animation Support**
+- Expo Router has native animation support via `animation` property
+- No need for complex custom interpolators for basic transitions
+- Use built-in animations for consistent platform behavior
+
+### **Animation Direction Patterns**
+```typescript
+// Forward navigation: slide_from_right (slides right → left)
+animation: 'slide_from_right'
+
+// Back navigation: slide_from_left (slides left → right) 
+animation: 'slide_from_left'
+
+// Modal presentations: slide_from_bottom
+animation: 'slide_from_bottom'
+```
+
+## 📱 Navigation Animation Implementation
+
+### **Dynamic Animation Based on Navigation Direction**
+When implementing back navigation with proper animations:
+
+```typescript
+// In layout file (e.g., app/(auth)/_layout.tsx)
+<Stack.Screen
+  name="welcome"
+  options={({ route }) => {
+    const isFromBack = (route.params as any)?.fromBack === 'true';
+    return {
+      animation: isFromBack ? 'slide_from_left' : 'slide_from_right',
+      animationDuration: 300,
+    };
+  }}
+/>
+```
+
+### **Back Navigation Handler Pattern**
+```typescript
+// In component (e.g., AuthScreen.tsx)
+const handleBack = async () => {
+  try {
+    if (navigation.canGoBack()) {
+      // Use native back animation
+      navigation.goBack();
+    } else {
+      // Fallback with custom back animation
+      router.replace({
+        pathname: '/previous-screen',
+        params: { fromBack: 'true' }, // Trigger back animation
+      });
+    }
+  } catch (error) {
+    console.error('Navigation error:', error);
+  }
+};
+```
+
+## 🔧 Available Animation Options
+
+### **Built-in Animation Types**
+- `slide_from_right` - Standard forward navigation (iOS-style)
+- `slide_from_left` - Back navigation or RTL
+- `slide_from_bottom` - Modal presentations
+- `fade` - Simple fade transition
+- `fade_from_bottom` - Android-style fade
+- `none` - No animation
+- `default` - Platform-specific default
+
+### **Animation Configuration**
+```typescript
+options={{
+  animation: 'slide_from_right',
+  animationDuration: 300,           // Custom duration
+  animationTypeForReplace: 'pop',   // For replace operations
+}}
+```
+
+## 🚨 Common Animation Issues & Solutions
+
+### **Problem: Wrong Back Animation Direction**
+❌ **Issue**: Back button animates in same direction as forward navigation
+```typescript
+// This causes same animation for both directions
+animation: 'slide_from_right'
+```
+
+✅ **Solution**: Use conditional animations based on navigation context
+```typescript
+animation: isFromBack ? 'slide_from_left' : 'slide_from_right'
+```
+
+### **Problem: "GO_BACK action not handled" Error**
+❌ **Issue**: Using `router.back()` when no navigation stack exists
+```typescript
+router.back(); // Fails if no previous screen
+```
+
+✅ **Solution**: Check navigation capability first
+```typescript
+if (navigation.canGoBack()) {
+  navigation.goBack();
+} else {
+  // Provide fallback navigation
+  router.replace('/fallback-screen');
+}
+```
+
+### **Problem: Reanimated Warnings During Render**
+⚠️ **Warning**: "Reading/Writing to `value` during component render"
+
+This indicates Reanimated shared values are being accessed during render. While not breaking, it suggests potential performance issues.
+
+## 🎨 Custom Animation Utilities
+
+### **Safe Animation Helpers**
+Reference [src/lib/animations.ts](mdc:src/lib/animations.ts) for worklet-safe animation utilities:
+
+```typescript
+// Use these for custom animations
+export const safeAnimateWithCallback = (value, callback, config) => {
+  'worklet';
+  return withTiming(value, config, (finished) => {
+    if (finished) {
+      runOnJS(callback)();
+    }
+  });
+};
+```
+
+### **Screen Transition Presets**
+```typescript
+export const screenTransitions = {
+  slideFromRight: {
+    animation: 'slide_from_right' as const,
+    animationDuration: 300,
+  },
+  slideFromLeft: {
+    animation: 'slide_from_left' as const,
+    animationDuration: 300,
+  },
+  fadeIn: {
+    animation: 'fade' as const,
+    animationDuration: 400,
+  },
+};
+```
+
+## 📋 Best Practices
+
+### **Animation Performance**
+- Use built-in animations over custom interpolators when possible
+- Set appropriate `animationDuration` (200-400ms typical)
+- Test on actual devices, not just simulators
+
+### **User Experience**
+- **Forward navigation**: Slide from right (iOS convention)
+- **Back navigation**: Slide from left (opposite direction)
+- **Modal presentations**: Slide from bottom
+- **Quick actions**: Use fade transitions
+
+### **Navigation State Management**
+- Always check `navigation.canGoBack()` before using back navigation
+- Provide fallback navigation paths
+- Use parameters to communicate navigation context between screens
+
+### **Platform Considerations**
+- iOS: Prefers slide animations with gesture support
+- Android: May use different default animations per OS version
+- Web: Consider reduced motion preferences
+
+## 🔗 Related Files
+
+- [src/lib/animations.ts](mdc:src/lib/animations.ts) - Animation utilities and presets
+- [src/app/(auth)/_layout.tsx](mdc:src/app/(auth)/_layout.tsx) - Example of dynamic animation configuration
+- [src/features/auth/components/AuthScreen.tsx](mdc:src/features/auth/components/AuthScreen.tsx) - Back navigation implementation
+
+## 🚀 Quick Implementation Checklist
+
+For implementing proper back animations:
+
+☐ Configure dynamic animations in Stack.Screen options<br/>
+☐ Use conditional animation based on navigation direction<br/>
+☐ Check `navigation.canGoBack()` before using back navigation<br/>
+☐ Provide fallback navigation with proper animation<br/>
+☐ Pass navigation context via route parameters<br/>
+☐ Test animations on actual devices<br/>
+☐ Ensure consistent animation duration across screens<br/>
+
+**Remember**: Good animations feel invisible to users - they should enhance the experience without drawing attention to themselves.

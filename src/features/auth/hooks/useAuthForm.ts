@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { router } from 'expo-router';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from './useAuth';
+import type { ProfileCreateData } from '../types';
 
 interface AuthFormData {
   email: string;
@@ -11,43 +11,71 @@ interface AuthFormData {
 
 export function useAuthForm() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { signIn, signUp } = useAuth();
+
+  const validateFormData = (data: AuthFormData): Record<string, string> => {
+    const validationErrors: Record<string, string> = {};
+
+    if (!data.email) {
+      validationErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+      validationErrors.email = 'Email is invalid';
+    }
+
+    if (!data.password) {
+      validationErrors.password = 'Password is required';
+    } else if (data.password.length < 6) {
+      validationErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (data.mode === 'signup' && !data.fullName) {
+      validationErrors.fullName = 'Full name is required for signup';
+    }
+
+    return validationErrors;
+  };
 
   const submit = async ({ email, password, fullName, mode }: AuthFormData) => {
     setLoading(true);
-    setError(null);
+    setErrors({});
 
     try {
-      if (mode === 'login') {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { full_name: fullName },
-          },
-        });
-        if (error) throw error;
+      // Validate form data
+      const validationErrors = validateFormData({ email, password, fullName, mode });
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
       }
 
-      // Navigation will be handled by auth state change in the provider
+      if (mode === 'login') {
+        await signIn(email, password);
+      } else {
+        // Create profile data for signup
+        const profileData: ProfileCreateData = {
+          full_name: fullName || '',
+          email: email,
+          username: undefined,
+          avatar_url: undefined,
+          website: undefined,
+          phone: undefined,
+        };
+
+        await signUp(email, password, profileData);
+      }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Authentication failed';
-      setError(message);
-      throw error;
+      // Handle any remaining errors
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      setErrors({ general: errorMessage });
     } finally {
       setLoading(false);
     }
   };
 
-  const clearError = () => {
-    setError(null);
+  return {
+    submit,
+    loading,
+    errors,
+    clearErrors: () => setErrors({}),
   };
-
-  return { submit, loading, error, clearError };
 }

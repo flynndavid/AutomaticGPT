@@ -9,7 +9,7 @@ export const KeyboardPaddingView =
         const { bottom } = useSafeAreaInsets();
 
         const keyboardHeightStyle = useAnimatedStyle(() => {
-          const keyboardHeight = keyboard.height.get();
+          const keyboardHeight = keyboard.height.value;
           // Only add the difference between keyboard height and safe area bottom
           // This prevents double padding since SafeAreaView already handles bottom inset
           return {

@@ -8,16 +8,51 @@ import {
   WeatherResultSchema,
   CelsiusConvertResultSchema,
 } from '@/types/api';
+import { db } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const requestBody = await req.json();
+    const validatedRequest = ChatRequestSchema.parse(requestBody);
+    const { messages, conversationId, userId, saveMessages = true } = validatedRequest;
 
     console.log('post messages:', messages);
+    console.log('conversation ID:', conversationId);
+    console.log('user ID:', userId);
+
+    // Save user message to database if persistence is enabled
+    let userMessageId: string | null = null;
+    if (saveMessages && conversationId && userId && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === 'user') {
+        try {
+          const { data: messageData } = await db.createMessage({
+            conversation_id: conversationId,
+            content: lastMessage.content,
+            role: lastMessage.role,
+            metadata: {
+              timestamp: new Date().toISOString(),
+              client_id: lastMessage.id || crypto.randomUUID(),
+            },
+          });
+          userMessageId = messageData?.id || null;
+          console.log('Saved user message:', userMessageId);
+        } catch (error) {
+          console.error('Failed to save user message:', error);
+        }
+      }
+    }
+
+    // Track timing for assistant response
+    const startTime = Date.now();
 
     const result = streamText({
       model: openai('gpt-4o'),
-      messages,
+      messages: messages.map((msg) => ({
+        role: msg.role,
+        content: msg.content || '',
+        ...(msg.id && { id: msg.id }),
+      })),
       tools: {
         // https://ai-sdk.dev/docs/getting-started/expo#enhance-your-chatbot-with-tools
         weather: tool({
@@ -49,6 +84,53 @@ export async function POST(req: Request) {
             return CelsiusConvertResultSchema.parse(result);
           },
         }),
+      },
+      onFinish: async (completion) => {
+        console.log('Stream finished');
+
+        // Save assistant response to database
+        if (saveMessages && conversationId && completion.text.trim()) {
+          const endTime = Date.now();
+          const responseTime = endTime - startTime;
+
+          try {
+            const { data: assistantMessage } = await db.createMessage({
+              conversation_id: conversationId,
+              content: completion.text.trim(),
+              role: 'assistant',
+              metadata: {
+                timestamp: new Date().toISOString(),
+                response_time_ms: responseTime,
+                user_message_id: userMessageId,
+                finish_reason: completion.finishReason,
+                usage: completion.usage,
+              },
+              model_used: 'gpt-4o',
+              tokens_used: completion.usage?.totalTokens || null,
+              response_time_ms: responseTime,
+              tool_calls: completion.toolCalls || [],
+              tool_results: completion.toolResults || [],
+            });
+
+            console.log('Saved assistant message:', assistantMessage?.id);
+
+            // Auto-generate conversation title if this is the first user message
+            if (messages.length <= 2) {
+              // user message + assistant response
+              try {
+                const generatedTitle = await db.generateConversationTitle(conversationId);
+                if (generatedTitle.data) {
+                  await db.updateConversation(conversationId, { title: generatedTitle.data });
+                  console.log('Updated conversation title:', generatedTitle.data);
+                }
+              } catch (titleError) {
+                console.error('Failed to generate conversation title:', titleError);
+              }
+            }
+          } catch (error) {
+            console.error('Failed to save assistant message:', error);
+          }
+        }
       },
     });
 

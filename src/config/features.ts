@@ -34,7 +34,7 @@ export const CORE_FEATURES = {
  */
 export const TEMPLATE_FEATURES = {
   // Authentication & User Management
-  enableAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_AUTH', false),
+  enableAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_AUTH', true),
   enableSocialAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SOCIAL_AUTH', false),
   enableProfile: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_PROFILE', false),
 
@@ -49,10 +49,10 @@ export const TEMPLATE_FEATURES = {
   enableFileUploads: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_FILE_UPLOADS', false),
 
   // Navigation & Layout
-  enableOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_ONBOARDING', false),
-  enableSplashOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING', false),
-  enableSidebar: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SIDEBAR', false),
-  enableTabNavigation: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_TAB_NAVIGATION', true),
+  enableOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_ONBOARDING', true),
+  enableSplashOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING', true),
+  enableSidebar: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SIDEBAR', true),
+  enableTabNavigation: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_TAB_NAVIGATION', false),
 
   // Advanced Features
   enableRealtime: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_REALTIME', false),

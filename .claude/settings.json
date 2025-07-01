@@ -1,0 +1,25 @@
+{
+  "allowedTools": [
+    "Edit",
+    "MultiEdit",
+    "Write",
+    "Read",
+    "Bash",
+    "Glob",
+    "Grep",
+    "LS",
+    "TodoRead",
+    "TodoWrite",
+    "WebFetch",
+    "WebSearch",
+    "NotebookRead",
+    "NotebookEdit",
+    "mcp__taskmaster-ai__*",
+    "mcp__supabase__*"
+  ],
+  "preferences": {
+    "autoCommit": false,
+    "showLineNumbers": true,
+    "verbosity": "concise"
+  }
+}

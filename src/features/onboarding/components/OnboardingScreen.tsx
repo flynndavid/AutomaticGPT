@@ -1,8 +1,12 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, FlatList } from 'react-native';
+import React, { useRef, useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Dimensions, FlatList, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { OnboardingSlide } from './OnboardingSlide';
 import { OnboardingIndicator } from './OnboardingIndicator';
+import { useTheme } from '@/features/shared';
+import { useOnboarding } from '../hooks/useOnboarding';
+import { ROUTES, getSafeRoute } from '@/config/routes';
 import { defaultSlides } from '../data/slides';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -10,16 +14,49 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const { isDark } = useTheme();
+  const { hasCompletedOnboarding, checkOnboardingStatus, completeOnboarding } = useOnboarding();
 
-  const handleSkip = () => {
-    router.replace('/(auth)/login');
+  // Check onboarding status on mount
+  useEffect(() => {
+    checkOnboardingStatus();
+  }, [checkOnboardingStatus]);
+
+  // Redirect if onboarding is already completed
+  useEffect(() => {
+    if (hasCompletedOnboarding === true) {
+      const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
+      router.replace(safeRoute as any);
+    }
+  }, [hasCompletedOnboarding]);
+
+  const handleSkip = async () => {
+    try {
+      await completeOnboarding();
+      const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
+      router.replace(safeRoute as any);
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      // Still navigate even if storage fails
+      const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
+      router.replace(safeRoute as any);
+    }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < defaultSlides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      router.replace('/(auth)/login');
+      try {
+        await completeOnboarding();
+        const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
+        router.replace(safeRoute as any);
+      } catch (error) {
+        console.error('Error completing onboarding:', error);
+        // Still navigate even if storage fails
+        const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
+        router.replace(safeRoute as any);
+      }
     }
   };
 
@@ -28,8 +65,23 @@ export function OnboardingScreen() {
     setCurrentIndex(index);
   };
 
+  // Don't render anything while checking onboarding status
+  if (hasCompletedOnboarding === null) {
+    return null;
+  }
+
+  // Don't render if onboarding is completed (will redirect)
+  if (hasCompletedOnboarding === true) {
+    return null;
+  }
+
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={isDark ? '#0f0f11' : '#fafaf9'}
+      />
+
       <FlatList
         ref={flatListRef}
         data={defaultSlides}
@@ -46,21 +98,25 @@ export function OnboardingScreen() {
         })}
       />
 
-      <View className="absolute bottom-0 left-0 right-0 px-6 pb-12">
+      <View className="absolute bottom-0 left-0 right-0 px-6 pb-12 bg-background">
         <OnboardingIndicator count={defaultSlides.length} currentIndex={currentIndex} />
 
-        <View className="flex-row justify-between mt-8">
-          <TouchableOpacity onPress={handleSkip} className="p-4">
-            <Text className="text-gray-600 text-base">Skip</Text>
+        <View className="flex-row justify-between items-center mt-12">
+          <TouchableOpacity onPress={handleSkip} className="py-4 px-6" style={{ minWidth: 80 }}>
+            <Text className="text-muted-foreground text-base font-medium">Skip</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleNext} className="bg-blue-500 px-8 py-4 rounded-full">
-            <Text className="text-white text-base font-semibold">
-              {currentIndex === defaultSlides.length - 1 ? 'Get Started' : 'Next'}
+          <TouchableOpacity
+            onPress={handleNext}
+            className="bg-primary px-8 py-4 rounded-full shadow-sm"
+            style={{ minWidth: 120 }}
+          >
+            <Text className="text-primary-foreground text-base font-semibold text-center">
+              {currentIndex === defaultSlides.length - 1 ? 'Get Started' : 'Continue'}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

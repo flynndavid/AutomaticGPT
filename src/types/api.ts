@@ -12,6 +12,9 @@ export const ChatRequestSchema = z.object({
   temperature: z.number().min(0).max(2).optional(),
   maxTokens: z.number().positive().optional(),
   stream: z.boolean().optional().default(true),
+  conversationId: z.string().uuid().optional(),
+  userId: z.string().uuid().optional(),
+  saveMessages: z.boolean().optional().default(true),
 });
 
 export const ChatResponseSchema = z.object({

@@ -1,4 +1,3 @@
-import { Redirect } from 'expo-router';
 import { OnboardingScreen } from '@/features/onboarding';
 import { AuthScreen } from '@/features/auth';
 import { FEATURES } from '@/config/features';

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useAuthForm } from '../hooks/useAuthForm';
+import { useTheme } from '@/features/shared';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -8,77 +9,95 @@ export function AuthForm() {
   const [fullName, setFullName] = useState('');
   const [mode, setMode] = useState<'login' | 'signup'>('login');
 
-  const { submit, loading, error } = useAuthForm();
+  const { submit, loading } = useAuthForm();
+  const { isDark } = useTheme();
+
+  // Check if Supabase is configured
+  const isSupabaseConfigured = !!(
+    process.env.EXPO_PUBLIC_SUPABASE_URL && process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
+  );
 
   const handleSubmit = async () => {
+    if (!isSupabaseConfigured) {
+      Alert.alert(
+        'Setup Required',
+        'Supabase authentication is not configured. Please add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY to your .env.local file.'
+      );
+      return;
+    }
+
     try {
       await submit({ email, password, fullName, mode });
     } catch (error) {
-      // Error is handled by the hook
-      console.error('Auth form submission error:', error);
+      // Error handling is now done in useAuthForm, but we can still show alerts for critical errors
+      console.error('Auth form error:', error);
     }
   };
 
-  const isFormValid = email && password && (mode === 'login' || fullName);
-
   return (
-    <View className="space-y-4">
-      {error && (
-        <View className="bg-red-50 border border-red-200 rounded-lg p-3">
-          <Text className="text-red-700 text-sm">{error}</Text>
+    <View className="space-y-5">
+      {!isSupabaseConfigured && (
+        <View className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-2">
+          <Text className="text-amber-800 text-sm font-medium mb-1">Setup Required</Text>
+          <Text className="text-amber-700 text-sm">
+            To use authentication, please configure Supabase in your .env.local file.
+          </Text>
         </View>
       )}
 
-      {mode === 'signup' && (
+      <View className="space-y-4 gap-4">
+        {mode === 'signup' && (
+          <View>
+            <Text className="text-sm font-medium text-foreground mb-2">Full Name</Text>
+            <TextInput
+              value={fullName}
+              onChangeText={setFullName}
+              placeholder="John Doe"
+              placeholderTextColor={isDark ? '#71717a' : '#a1a1aa'}
+              className="w-full px-4 py-4 bg-input rounded-xl text-base text-foreground border border-border"
+              autoCapitalize="words"
+            />
+          </View>
+        )}
+
         <View>
-          <Text className="text-sm font-medium text-gray-700 mb-1">Full Name</Text>
+          <Text className="text-sm font-medium text-foreground mb-2">Email</Text>
           <TextInput
-            value={fullName}
-            onChangeText={setFullName}
-            placeholder="John Doe"
-            className="w-full px-4 py-3 bg-gray-50 rounded-lg text-base border border-gray-200"
-            autoCapitalize="words"
-            autoComplete="name"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@example.com"
+            placeholderTextColor={isDark ? '#71717a' : '#a1a1aa'}
+            className="w-full px-4 py-4 bg-input rounded-xl text-base text-foreground border border-border"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoComplete="email"
           />
         </View>
-      )}
 
-      <View>
-        <Text className="text-sm font-medium text-gray-700 mb-1">Email</Text>
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          placeholder="you@example.com"
-          className="w-full px-4 py-3 bg-gray-50 rounded-lg text-base border border-gray-200"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoComplete="email"
-        />
-      </View>
-
-      <View>
-        <Text className="text-sm font-medium text-gray-700 mb-1">Password</Text>
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          placeholder="••••••••"
-          className="w-full px-4 py-3 bg-gray-50 rounded-lg text-base border border-gray-200"
-          secureTextEntry
-          autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-        />
+        <View>
+          <Text className="text-sm font-medium text-foreground mb-2">Password</Text>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="••••••••"
+            placeholderTextColor={isDark ? '#71717a' : '#a1a1aa'}
+            className="w-full px-4 py-4 bg-input rounded-xl text-base text-foreground border border-border"
+            secureTextEntry
+            autoComplete="password"
+          />
+        </View>
       </View>
 
       <TouchableOpacity
         onPress={handleSubmit}
-        disabled={loading || !isFormValid}
-        className={`w-full py-4 rounded-lg items-center ${
-          loading || !isFormValid ? 'bg-gray-300' : 'bg-blue-500'
-        }`}
+        disabled={loading || !isSupabaseConfigured}
+        className="w-full bg-primary py-4 rounded-xl items-center mt-8 shadow-sm"
+        style={{ opacity: loading || !isSupabaseConfigured ? 0.7 : 1 }}
       >
         {loading ? (
           <ActivityIndicator color="white" />
         ) : (
-          <Text className="text-white text-base font-semibold">
+          <Text className="text-primary-foreground text-base font-semibold">
             {mode === 'login' ? 'Sign In' : 'Create Account'}
           </Text>
         )}
@@ -86,9 +105,9 @@ export function AuthForm() {
 
       <TouchableOpacity
         onPress={() => setMode(mode === 'login' ? 'signup' : 'login')}
-        className="py-2"
+        className="py-3"
       >
-        <Text className="text-center text-blue-500">
+        <Text className="text-center text-primary font-medium">
           {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
         </Text>
       </TouchableOpacity>

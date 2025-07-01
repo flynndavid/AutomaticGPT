@@ -1,39 +1,37 @@
 import React from 'react';
-import { View, Text, Image, ActivityIndicator } from 'react-native';
+import { View, StatusBar, Image } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { useTheme } from '@/features/shared';
 
 interface SplashScreenProps {
   appName?: string;
-  logoSource?: any;
-  backgroundSource?: any;
 }
 
-export function SplashScreen({
-  appName = 'MyApp',
-  logoSource,
-  backgroundSource,
-}: SplashScreenProps) {
+export function SplashScreen({ appName = 'MyApp' }: SplashScreenProps) {
+  const { isDark } = useTheme();
+
   return (
     <Animated.View
-      entering={FadeIn.duration(300)}
+      entering={FadeIn.duration(400)}
       exiting={FadeOut.duration(300)}
-      className="flex-1 items-center justify-center bg-white"
+      className="flex-1 items-center justify-center bg-background"
     >
-      {backgroundSource && (
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={isDark ? '#0f0f11' : '#fafaf9'}
+      />
+
+      {/* Simple Logo Icon */}
+      <Animated.View
+        entering={FadeIn.delay(200).duration(600)}
+        className="items-center justify-center"
+      >
         <Image
-          source={backgroundSource}
-          className="absolute inset-0 w-full h-full"
-          resizeMode="cover"
+          source={require('../../../../assets/images/logo_icon.png')}
+          className="w-20 h-20"
+          resizeMode="contain"
         />
-      )}
-
-      <View className="items-center space-y-8">
-        {logoSource && <Image source={logoSource} className="w-32 h-32" resizeMode="contain" />}
-
-        <Text className="text-3xl font-bold text-gray-900">{appName}</Text>
-
-        <ActivityIndicator size="large" color="#3b82f6" />
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 }

@@ -82,3 +82,39 @@ export const animationConfigs = {
     mass: 0.8,
   },
 } as const;
+
+/**
+ * Screen transition animations for Expo Router
+ */
+export const screenTransitions = {
+  // For initial app load - smooth fade in
+  fadeIn: {
+    animation: 'fade' as const,
+    animationDuration: 400,
+  },
+
+  // For forward navigation - slide from right
+  slideFromRight: {
+    animation: 'slide_from_right' as const,
+    animationDuration: 300,
+  },
+
+  // For back navigation - slide to right (opposite of slideFromRight)
+  slideToRight: {
+    animation: 'slide_from_left' as const,
+    animationDuration: 300,
+  },
+
+  // Alternative back animation that actually slides to the right
+  slideBackToRight: {
+    animation: 'slide_from_right' as const,
+    animationDuration: 300,
+    animationTypeForReplace: 'pop' as const,
+  },
+
+  // For modal presentations
+  slideFromBottom: {
+    animation: 'slide_from_bottom' as const,
+    animationDuration: 350,
+  },
+} as const;

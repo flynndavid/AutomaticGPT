@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, Dimensions } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
+import { useTheme } from '@/features/shared';
 import type { OnboardingSlide as OnboardingSlideType } from '../data/slides';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -9,23 +10,26 @@ interface OnboardingSlideProps {
 }
 
 export function OnboardingSlide({ slide }: OnboardingSlideProps) {
+  const { isDark } = useTheme();
+
   return (
     <View
-      style={{
-        width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT,
-        backgroundColor: slide.backgroundColor || '#ffffff',
-      }}
-      className="flex-1 items-center justify-center px-8"
+      style={{ width: SCREEN_WIDTH }}
+      className="flex-1 bg-background items-center justify-center px-8"
     >
-      {slide.image && (
-        <Image source={slide.image} className="w-64 h-64 mb-12" resizeMode="contain" />
-      )}
+      <View className="items-center max-w-sm">
+        {/* Icon placeholder - using emoji as icon */}
+        <View className="w-20 h-20 bg-primary/10 rounded-full items-center justify-center mb-12">
+          <Text className="text-4xl">{slide.icon}</Text>
+        </View>
 
-      <View className="items-center space-y-6 max-w-sm">
-        <Text className="text-4xl font-bold text-white text-center">{slide.title}</Text>
+        {/* Title */}
+        <Text className="text-3xl font-bold text-center text-foreground mb-6 tracking-tight">
+          {slide.title}
+        </Text>
 
-        <Text className="text-lg text-white/90 text-center leading-relaxed">
+        {/* Description */}
+        <Text className="text-lg text-center leading-relaxed text-muted-foreground">
           {slide.description}
         </Text>
       </View>

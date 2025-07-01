@@ -1,279 +1,469 @@
 # Auth & Onboarding Setup Guide
 
-This guide will help you set up authentication and onboarding features in your Expo app.
-
 ## 🚀 Quick Start
 
-1. **Copy Environment Variables**
+The auth and onboarding flow is now fully implemented and ready to use! This guide will help you configure and customize it for your needs.
 
-   ```bash
-   cp .env.example .env.local
-   ```
+## 📋 Features Included
 
-2. **Enable Features** (edit your `.env.local`)
+✅ **Splash Screen** - Professional app loading with branding  
+✅ **Onboarding Flow** - 3-screen carousel with feature highlights  
+✅ **Email Authentication** - Login/signup with email and password  
+✅ **Persistent Sessions** - Automatic login for returning users  
+✅ **Theme Support** - Light/dark mode with consistent styling  
+✅ **Navigation Flow** - Automatic routing based on auth state
 
-   ```bash
-   EXPO_PUBLIC_ENABLE_AUTH=true
-   EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING=true
-   EXPO_PUBLIC_ENABLE_ONBOARDING=true
-   EXPO_PUBLIC_ENABLE_EMAIL_AUTH=true
-   ```
+## 🔧 Environment Setup
 
-3. **Set up Supabase** (required for auth)
-   - Create a new project at [supabase.com](https://supabase.com)
-   - Get your project URL and anon key
-   - Update your `.env.local`:
-     ```bash
-     EXPO_PUBLIC_SUPABASE_URL=your_project_url
-     EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-     ```
+### 1. Copy Environment Variables
 
-4. **Run Database Migration**
-   Execute this SQL in your Supabase SQL editor:
-
-   ```sql
-   -- Create profiles table
-   CREATE TABLE profiles (
-     id UUID REFERENCES auth.users(id) PRIMARY KEY,
-     email TEXT UNIQUE,
-     phone TEXT UNIQUE,
-     full_name TEXT,
-     avatar_url TEXT,
-     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
-     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
-   );
-
-   -- Enable Row Level Security
-   ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-
-   -- Create policies
-   CREATE POLICY "Users can view own profile" ON profiles
-     FOR SELECT USING (auth.uid() = id);
-
-   CREATE POLICY "Users can update own profile" ON profiles
-     FOR UPDATE USING (auth.uid() = id);
-
-   -- Create trigger for new user profiles
-   CREATE OR REPLACE FUNCTION handle_new_user()
-   RETURNS TRIGGER AS $$
-   BEGIN
-     INSERT INTO public.profiles (id, email, full_name)
-     VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name');
-     RETURN new;
-   END;
-   $$ LANGUAGE plpgsql SECURITY DEFINER;
-
-   CREATE TRIGGER on_auth_user_created
-     AFTER INSERT ON auth.users
-     FOR EACH ROW EXECUTE FUNCTION handle_new_user();
-   ```
-
-5. **Start the App**
-   ```bash
-   npm start
-   ```
-
-## 🎛️ Feature Configuration
-
-### Authentication Methods
-
-Control which authentication methods are available:
+Create a `.env.local` file in your project root with these variables:
 
 ```bash
-# Email/Password (always recommended)
+# Authentication & Onboarding Features
+EXPO_PUBLIC_ENABLE_AUTH=true
+EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING=true
+EXPO_PUBLIC_ENABLE_ONBOARDING=true
+
+# Individual Auth Methods
 EXPO_PUBLIC_ENABLE_EMAIL_AUTH=true
-
-# SMS Authentication (future feature)
 EXPO_PUBLIC_ENABLE_SMS_AUTH=false
-
-# OAuth Providers (future features)
 EXPO_PUBLIC_ENABLE_GOOGLE_AUTH=false
 EXPO_PUBLIC_ENABLE_APPLE_AUTH=false
+
+# Supabase Configuration (required)
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# UI Features
+EXPO_PUBLIC_ENABLE_DARK_MODE=true
+EXPO_PUBLIC_ENABLE_SIDEBAR=true
 ```
 
-### Splash & Onboarding
+### 2. Supabase Setup
 
-```bash
-# Show custom splash screen with app branding
-EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING=true
+#### Create a Supabase Project
 
-# Show onboarding carousel for new users
-EXPO_PUBLIC_ENABLE_ONBOARDING=true
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Note your project URL and anon key from Settings > API
+
+#### Run Database Migration
+
+Execute this SQL in your Supabase SQL editor:
+
+```sql
+-- Create profiles table
+CREATE TABLE profiles (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  email TEXT UNIQUE,
+  phone TEXT UNIQUE,
+  full_name TEXT,
+  avatar_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+);
+
+-- Enable Row Level Security
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Users can view own profile" ON profiles
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Create trigger for new user profiles
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name)
+  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name');
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 ```
 
-## 📱 User Flow
-
-With all features enabled:
-
-1. **Splash Screen** - App logo and loading indicator
-2. **Onboarding** - 3-slide carousel explaining features (skippable)
-3. **Authentication** - Unified login/signup form
-4. **Main App** - Chat interface (authenticated users only)
-
-## 🔧 Customization
+## 🎨 Customization
 
 ### Splash Screen
 
-Edit `src/features/splash/components/SplashScreen.tsx`:
+Customize in `src/features/splash/components/SplashScreen.tsx`:
 
-- Change app name
-- Add your logo
-- Customize background
+- App name
+- Logo image
+- Background image
+- Loading duration
 
 ### Onboarding Slides
 
 Edit `src/features/onboarding/data/slides.ts`:
 
-- Modify slide content
-- Add images
-- Change colors
-
-### Auth Screen
-
-Edit `src/features/auth/components/AuthForm.tsx`:
-
-- Customize form fields
-- Add validation rules
-- Modify styling
-
-## 🏗️ Architecture
-
-### Route Structure
-
-```
-src/app/
-├── _layout.tsx          # Root layout with auth wrapper
-├── (auth)/              # Authentication routes
-│   ├── _layout.tsx      # Auth layout (unauthenticated only)
-│   ├── welcome.tsx      # Onboarding or direct to login
-│   └── login.tsx        # Authentication form
-├── (app)/               # Protected routes
-│   ├── _layout.tsx      # App layout (authenticated only)
-│   └── index.tsx        # Main app (Chat)
-└── index.tsx            # Route redirect logic
+```typescript
+export const defaultSlides: OnboardingSlide[] = [
+  {
+    id: '1',
+    title: 'Your App Name',
+    description: 'Your app description',
+    backgroundColor: '#3b82f6', // Custom color
+  },
+  // Add more slides...
+];
 ```
 
-### Feature Structure
+### Theme Colors
+
+The app uses a global theme system defined in `src/features/shared/utils/themes.ts`. All auth screens automatically adapt to light/dark mode.
+
+## 🔄 Navigation Flow
 
 ```
-src/features/
-├── auth/                # Authentication feature
-│   ├── components/      # Auth UI components
-│   ├── hooks/          # Auth logic (useAuth, useAuthForm)
-│   └── types/          # Auth TypeScript types
-├── onboarding/         # Onboarding feature
-│   ├── components/     # Onboarding UI
-│   ├── hooks/         # Onboarding state management
-│   └── data/          # Slide content
-└── splash/            # Splash screen feature
-    ├── components/    # Splash UI
-    └── hooks/        # Splash timing logic
+App Launch
+    ↓
+Splash Screen (2s)
+    ↓
+Auth Check
+    ├─ Authenticated → Home Screen (Chat)
+    └─ Not Authenticated → Onboarding (3 slides)
+                              ↓
+                          Auth Screen (Login/Signup)
+                              ↓
+                          Home Screen (Chat)
 ```
 
-## 🔒 Security
+## 🧪 Testing the Flow
 
-### Supabase Security
+1. **First Launch**: See splash → onboarding → auth screen
+2. **Skip Onboarding**: Tap "Skip" to go directly to auth
+3. **Sign Up**: Create account with email/password
+4. **Automatic Login**: Close and reopen app - should go directly to chat
+5. **Sign Out**: Use sidebar menu to sign out and return to auth flow
 
-- Row Level Security (RLS) is enabled by default
-- Users can only access their own profile data
-- Authentication handled by Supabase Auth
+## ⚙️ Feature Flags
 
-### Environment Variables
+Control features via environment variables:
 
-- Never commit real API keys
-- Use `.env.local` for development
-- Set production keys in your deployment platform
+| Variable                               | Default | Description                          |
+| -------------------------------------- | ------- | ------------------------------------ |
+| `EXPO_PUBLIC_ENABLE_AUTH`              | `true`  | Enable/disable entire auth system    |
+| `EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING` | `true`  | Show splash screen                   |
+| `EXPO_PUBLIC_ENABLE_ONBOARDING`        | `true`  | Show onboarding carousel             |
+| `EXPO_PUBLIC_ENABLE_EMAIL_AUTH`        | `true`  | Email/password authentication        |
+| `EXPO_PUBLIC_ENABLE_SMS_AUTH`          | `false` | SMS authentication (not implemented) |
+| `EXPO_PUBLIC_ENABLE_GOOGLE_AUTH`       | `false` | Google OAuth (not implemented)       |
+| `EXPO_PUBLIC_ENABLE_APPLE_AUTH`        | `false` | Apple Sign-In (not implemented)      |
 
-## 🧪 Testing
+## 🚨 Troubleshooting
 
-### Manual Testing Checklist
+### "Missing Supabase URL" Error
 
-- [ ] Splash screen shows and dismisses
-- [ ] Onboarding can be skipped
-- [ ] User can create account
-- [ ] User can sign in
-- [ ] User can sign out
-- [ ] Session persists on app restart
-- [ ] Protected routes redirect to auth
+- Ensure `EXPO_PUBLIC_SUPABASE_URL` is set in `.env.local`
+- Restart development server after adding env vars
 
-### Error Scenarios
+### Auth State Not Persisting
 
-- [ ] Invalid email format
-- [ ] Weak password
-- [ ] Network failure
-- [ ] Supabase service unavailable
+- Check that `@react-native-async-storage/async-storage` is installed
+- Verify Supabase client configuration in `src/lib/supabase.ts`
 
-## 🚫 Disabling Features
+### Onboarding Not Showing
 
-### Disable Authentication
+- Verify `EXPO_PUBLIC_ENABLE_ONBOARDING=true` in `.env.local`
+- Check that you're starting from an unauthenticated state
 
-```bash
-EXPO_PUBLIC_ENABLE_AUTH=false
-```
+### Navigation Issues
 
-App will go directly to chat without auth requirements.
+- Clear app data/cache and restart
+- Check auth state in React Native debugger
 
-### Disable Onboarding
+## 🔮 Next Steps
 
-```bash
-EXPO_PUBLIC_ENABLE_ONBOARDING=false
-```
-
-Users go directly to login screen.
-
-### Disable Splash Screen
-
-```bash
-EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING=false
-```
-
-App starts immediately without custom splash.
-
-## 🔮 Future Features
-
-Coming in future updates:
+### Planned Features (Not Yet Implemented)
 
 - SMS authentication with OTP
-- Google Sign-In
-- Apple Sign-In (iOS)
-- Biometric authentication
+- Google OAuth integration
+- Apple Sign-In
 - Password reset flow
-- Profile management
-- Account deletion
+- Profile management screen
+- Biometric authentication
 
-## 🆘 Troubleshooting
+### Customization Ideas
 
-### Common Issues
+- Add your app logo to splash screen
+- Customize onboarding slides with your features
+- Add company branding and colors
+- Implement custom auth providers
+- Add terms of service and privacy policy links
 
-**"Cannot connect to Supabase"**
+## 📚 Related Documentation
 
-- Check your Supabase URL and anon key
-- Verify your Supabase project is active
-- Check network connectivity
+- [Features Overview](./FEATURES.md)
+- [Setup Guide](./SETUP.md)
+- [Chat Feature](./features/chat/README.md)
+- [Shared Components](./features/README.md)
 
-**"Auth redirects not working"**
+## 🆘 Support
 
-- Clear app data/storage
-- Check that both auth and app route groups exist
-- Verify navigation logic in layouts
+If you encounter issues:
 
-**"Splash screen shows forever"**
+1. Check this documentation
+2. Verify environment variables
+3. Check Supabase project settings
+4. Review console errors
+5. Create an issue with reproduction steps
 
-- Check console for JavaScript errors
-- Verify expo-splash-screen is installed
-- Check if splash screen timing is too long
+# Authentication & Onboarding Setup Guide
 
-### Debug Mode
+This guide explains how to set up authentication with user profiles in your Expo app using Supabase.
 
-Enable debug logging:
+## Overview
 
-```bash
-EXPO_PUBLIC_DEBUG_MODE=true
-EXPO_PUBLIC_LOG_LEVEL=debug
+The authentication system now automatically creates user profiles when users sign up. The profile data is stored in a `profiles` table in the public schema and includes:
+
+- Basic user information (name, email, phone)
+- Profile customization (username, avatar, bio, website)
+- Automatic timestamps (created_at, updated_at)
+
+## Database Schema
+
+### Profiles Table Structure
+
+```sql
+CREATE TABLE public.profiles (
+    id UUID REFERENCES auth.users ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+    email TEXT NOT NULL,
+    username TEXT UNIQUE,
+    full_name TEXT,
+    avatar_url TEXT,
+    website TEXT,
+    phone TEXT,
+    bio TEXT,
+
+    PRIMARY KEY (id)
+);
 ```
 
-## 📞 Support
+### Automatic Profile Creation
 
-- Check the [FEATURES.md](../FEATURES.md) for implementation status
-- Review the [implementation guide](../roadmap/in_progress/auth_onboarding_implementation_guide.md)
-- Open an issue for bugs or feature requests
+When a user signs up, a database trigger automatically creates a profile record using the metadata provided during signup:
+
+```sql
+-- Trigger function that runs after user creation
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.profiles (id, email, full_name)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        NEW.raw_user_meta_data->>'full_name'
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+```
+
+## Row Level Security (RLS)
+
+The profiles table has RLS enabled with the following policies:
+
+- **Public Read**: All profiles are viewable by everyone
+- **User Insert**: Users can only insert their own profile
+- **User Update**: Users can only update their own profile
+
+```sql
+-- RLS Policies
+CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles
+    FOR SELECT USING (true);
+
+CREATE POLICY "Users can insert their own profile." ON public.profiles
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile." ON public.profiles
+    FOR UPDATE USING (auth.uid() = id);
+```
+
+## Environment Variables
+
+Make sure you have the following environment variables set:
+
+```bash
+# .env.local
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+## Usage in Code
+
+### Signup Flow
+
+The signup process now automatically creates a profile:
+
+```typescript
+import { useAuth } from '@/features/auth';
+
+function SignupForm() {
+  const { signUp } = useAuth();
+
+  const handleSignup = async () => {
+    const profileData = {
+      full_name: 'John Doe',
+      email: 'john@example.com',
+      phone: '+1234567890', // optional
+    };
+
+    await signUp(email, password, profileData);
+  };
+}
+```
+
+### Accessing Profile Data
+
+```typescript
+import { useAuth } from '@/features/auth';
+
+function ProfileScreen() {
+  const { profile, user, updateProfile } = useAuth();
+
+  if (!profile) return <Loading />;
+
+  return (
+    <View>
+      <Text>{profile.full_name}</Text>
+      <Text>{profile.email}</Text>
+      {profile.username && <Text>@{profile.username}</Text>}
+    </View>
+  );
+}
+```
+
+### Updating Profile
+
+```typescript
+const handleUpdateProfile = async () => {
+  await updateProfile({
+    username: 'johndoe',
+    bio: 'Software developer',
+    website: 'https://johndoe.com',
+  });
+};
+```
+
+## Database Migration
+
+If you're setting up a new Supabase project, run this migration to create the profiles table:
+
+```sql
+-- Create profiles table for user profile data
+CREATE TABLE public.profiles (
+    id UUID REFERENCES auth.users ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+    email TEXT NOT NULL,
+    username TEXT UNIQUE,
+    full_name TEXT,
+    avatar_url TEXT,
+    website TEXT,
+    phone TEXT,
+    bio TEXT,
+
+    PRIMARY KEY (id)
+);
+
+-- Set up Row Level Security (RLS)
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles
+    FOR SELECT USING (true);
+
+CREATE POLICY "Users can insert their own profile." ON public.profiles
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile." ON public.profiles
+    FOR UPDATE USING (auth.uid() = id);
+
+-- Create function to automatically create profile on user signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.profiles (id, email, full_name)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        NEW.raw_user_meta_data->>'full_name'
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create trigger to automatically create profile on user signup
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- Create function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = TIMEZONE('utc'::text, NOW());
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger to automatically update updated_at
+CREATE TRIGGER handle_updated_at
+    BEFORE UPDATE ON public.profiles
+    FOR EACH ROW EXECUTE PROCEDURE public.handle_updated_at();
+```
+
+## Testing the Setup
+
+1. **Sign up a new user** through your app
+2. **Check the profiles table** in your Supabase dashboard
+3. **Verify the profile was created** with the correct data
+4. **Test profile updates** through the app
+
+## Troubleshooting
+
+### Profile Not Created After Signup
+
+1. Check if the database trigger exists:
+
+   ```sql
+   SELECT * FROM information_schema.triggers
+   WHERE trigger_name = 'on_auth_user_created';
+   ```
+
+2. Verify RLS policies are correct:
+
+   ```sql
+   SELECT * FROM pg_policies WHERE tablename = 'profiles';
+   ```
+
+3. Check Supabase logs for errors during signup
+
+### Profile Data Not Loading
+
+1. Verify the user is authenticated
+2. Check RLS policies allow reading profiles
+3. Ensure the profile exists in the database
+
+## Security Considerations
+
+- **Email Verification**: Consider enabling email verification in Supabase Auth settings
+- **Profile Privacy**: Adjust RLS policies if you need private profiles
+- **Data Validation**: Add constraints to the database for data integrity
+- **File Uploads**: Set up storage buckets for avatar images if needed
+
+## Next Steps
+
+- Add profile image upload functionality
+- Implement username availability checking
+- Add social authentication providers
+- Create profile completion onboarding flow
