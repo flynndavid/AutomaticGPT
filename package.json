@@ -1,15 +1,17 @@
 {
-  "name": "automatic-expogpt-template",
+  "name": "create-expo-ai-template",
   "version": "1.0.0",
-  "description": "Automatic ExpoGPT Template - A production-ready Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
+  "description": "A production-ready Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
   "main": "expo-router/entry",
   "keywords": [
     "expo",
     "template",
+    "create-expo-app",
     "react-native",
     "ai",
     "chat",
     "openai",
+    "gpt",
     "supabase",
     "authentication",
     "typescript",
@@ -20,24 +22,46 @@
     "sharing",
     "mobile",
     "web",
-    "cross-platform"
+    "cross-platform",
+    "starter",
+    "boilerplate"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com"
+    "name": "David Flynn",
+    "email": "david@flynndavid.com"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/expo-ai-template"
+    "url": "https://github.com/flynndavid/automatic-sandbox-expo-1.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/expo-ai-template/issues"
+    "url": "https://github.com/flynndavid/automatic-sandbox-expo-1/issues"
   },
-  "homepage": "https://github.com/yourusername/expo-ai-template#readme",
+  "homepage": "https://github.com/flynndavid/automatic-sandbox-expo-1#readme",
+  "files": [
+    "src",
+    "assets",
+    "supabase",
+    "scripts",
+    "docs",
+    "app.json",
+    "babel.config.js",
+    "metro.config.js",
+    "tailwind.config.js",
+    "tsconfig.json",
+    "jest.config.js",
+    "jest.setup.js",
+    "eslint.config.js",
+    "nativewind-env.d.ts",
+    "global.d.ts",
+    ".env.example",
+    "TEMPLATE_README.md",
+    "LICENSE"
+  ],
   "expo": {
     "template": {
-      "name": "Automatic ExpoGPT Template",
+      "name": "AI-Powered Expo Template",
       "description": "A comprehensive Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
       "icon": "./assets/images/logo_icon.png",
       "category": "ai",
