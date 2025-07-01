@@ -2,14 +2,14 @@
 
 /**
  * Interactive Template Setup Wizard
- * Helps developers configure the Expo template after cloning
+ * Streamlined setup for the Expo AI Template
  */
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// Simple console utilities (avoiding external dependencies for now)
+// Console utilities
 const colors = {
   reset: '\x1b[0m',
   bright: '\x1b[1m',
@@ -18,6 +18,7 @@ const colors = {
   yellow: '\x1b[33m',
   red: '\x1b[31m',
   cyan: '\x1b[36m',
+  magenta: '\x1b[35m',
 };
 
 const log = {
@@ -28,7 +29,7 @@ const log = {
   title: (msg) => console.log(`\n${colors.bright}${colors.cyan}🚀 ${msg}${colors.reset}\n`),
 };
 
-// Simple prompt utility (can be enhanced with inquirer later)
+// Simple prompt utility
 const prompt = (question, defaultValue = '') => {
   const readline = require('readline');
   const rl = readline.createInterface({
@@ -53,161 +54,214 @@ const confirm = async (question, defaultValue = true) => {
 };
 
 async function setupTemplate() {
-  log.title('Welcome to the Expo Template Setup Wizard!');
+  log.title('Welcome to the Expo AI Template Setup! 🤖');
 
   console.log(
-    'This wizard will help you configure your new Expo app with the features you need.\n'
+    `${colors.bright}This template includes:${colors.reset}
+• 🔐 Authentication & User Management
+• 💬 AI Chat with OpenAI GPT-4o
+• 🗂️ Conversation Management & Analytics
+• 🔗 Conversation Sharing
+• 🎨 Theme Customization & Navigation
+
+${colors.green}Let's get you set up quickly!${colors.reset}\n`
   );
 
   try {
-    // 1. Basic App Configuration
-    log.info("Let's start with basic app configuration...");
+    // 1. Basic App Information
+    log.info('📱 App Information');
 
-    const appName = await prompt('What is your app name?', 'My Awesome App');
+    const appName = await prompt('What is your app name?', 'My AI App');
     const appSlug = await prompt(
       'App slug (for URLs and package name)',
       appName
         .toLowerCase()
         .replace(/[^a-z0-9]/g, '-')
         .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
     );
 
-    // 2. Feature Selection
-    log.info("\nNow let's choose which features to enable...");
+    // 2. API Keys (Required)
+    log.info('\n🔑 API Configuration');
+    console.log('You need these API keys to use all features:\n');
 
-    const features = {
-      // Core features (currently implemented)
-      enableDarkMode: await confirm('Enable dark mode support?', true),
-      enableHaptics: await confirm('Enable haptic feedback?', true),
-      enableAnimations: await confirm('Enable UI animations?', true),
+    const hasSupabase = await confirm('Do you have Supabase credentials ready?', false);
+    const hasOpenAI = await confirm('Do you have an OpenAI API key ready?', false);
 
-      // Template features (future implementation)
-      enableAuth: await confirm('Enable authentication (login/signup)?', false),
-      enableStorage: await confirm('Enable file storage and uploads?', false),
-      enableOnboarding: await confirm('Enable user onboarding flow?', false),
-      enableProfile: await confirm('Enable user profile management?', false),
-      enableSidebar: await confirm('Enable app sidebar navigation?', false),
-      enableAnalytics: await confirm('Enable analytics tracking?', false),
-    };
+    let supabaseConfig = null;
+    let openaiConfig = null;
 
-    // 3. Branding Configuration
-    log.info("\nLet's configure your app's branding...");
+    if (hasSupabase) {
+      supabaseConfig = await setupSupabaseConfig();
+    }
 
-    const primaryColors = {
-      Blue: '#3B82F6',
-      Green: '#10B981',
-      Purple: '#8B5CF6',
-      Red: '#EF4444',
-      Orange: '#F97316',
-    };
+    if (hasOpenAI) {
+      openaiConfig = await setupOpenAIConfig();
+    }
 
-    console.log('\nAvailable colors:');
-    Object.entries(primaryColors).forEach(([name, hex], index) => {
-      console.log(`  ${index + 1}. ${name} (${hex})`);
-    });
-
-    const colorChoice = await prompt('Choose primary color (1-5)', '1');
-    const colorIndex = parseInt(colorChoice) - 1;
-    const primaryColor = Object.values(primaryColors)[colorIndex] || '#3B82F6';
-
-    const themeMode = await prompt('Default theme mode (light/dark/system)', 'system');
-
-    // 4. Generate configuration files
-    log.info('\nGenerating configuration files...');
+    // 3. Generate Configuration Files
+    log.info('\n📝 Generating configuration files...');
 
     await generateEnvFile({
       appName,
       appSlug,
-      features,
-      primaryColor,
-      themeMode,
+      supabaseConfig,
+      openaiConfig,
     });
 
     await updateAppConfig({ appName, appSlug });
     await updatePackageJson({ appName, appSlug });
+    await generateReadme({ appName, appSlug });
 
-    // 5. Check for optional integrations
-    const hasSupabase = await confirm('\nDo you have Supabase credentials ready?', false);
-    const hasOpenAI = await confirm('Do you have an OpenAI API key ready?', false);
-
-    if (hasSupabase) {
-      await setupSupabasePrompt();
-    }
-
-    if (hasOpenAI) {
-      await setupOpenAIPrompt();
-    }
-
-    // 6. Install dependencies if needed
-    const shouldInstall = await confirm('\nInstall dependencies now?', true);
+    // 4. Install Dependencies
+    const shouldInstall = await confirm('\n📦 Install dependencies now?', true);
     if (shouldInstall) {
       log.info('Installing dependencies...');
-      execSync('npm install', { stdio: 'inherit' });
-      log.success('Dependencies installed successfully!');
+      try {
+        execSync('npm install', { stdio: 'inherit' });
+        log.success('Dependencies installed successfully!');
+      } catch (_error) {
+        log.error('Failed to install dependencies. Please run "npm install" manually.');
+      }
     }
 
-    // 7. Show completion message
-    showCompletionMessage({ hasSupabase, hasOpenAI, features });
+    // 5. Show Completion Message
+    showCompletionMessage({
+      appName,
+      hasSupabase,
+      hasOpenAI,
+    });
   } catch (error) {
     log.error(`Setup failed: ${error.message}`);
     process.exit(1);
   }
 }
 
+async function setupSupabaseConfig() {
+  log.info('\n🔧 Supabase Configuration:');
+
+  const supabaseUrl = await prompt('Supabase Project URL');
+  const supabaseAnonKey = await prompt('Supabase Anon Key');
+  const supabaseServiceKey = await prompt('Supabase Service Role Key (optional)');
+
+  return {
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
+    serviceKey: supabaseServiceKey,
+  };
+}
+
+async function setupOpenAIConfig() {
+  log.info('\n🤖 OpenAI Configuration:');
+
+  const openaiKey = await prompt('OpenAI API Key');
+
+  return {
+    apiKey: openaiKey,
+  };
+}
+
 async function generateEnvFile(config) {
   const envPath = path.join(process.cwd(), '.env.local');
 
-  const envContent = `# Generated by template setup wizard
-# ${new Date().toISOString()}
+  const envContent = `# =============================================================================
+# EXPO AI TEMPLATE - ENVIRONMENT CONFIGURATION
+# =============================================================================
+# Generated by template setup wizard on ${new Date().toISOString()}
 
-# =====================================================
+# =============================================================================
 # APP CONFIGURATION
-# =====================================================
+# =============================================================================
 EXPO_PUBLIC_APP_NAME="${config.appName}"
 EXPO_PUBLIC_APP_SLUG="${config.appSlug}"
-EXPO_PUBLIC_APP_VERSION=1.0.0
-EXPO_PUBLIC_BUILD_NUMBER=1
-EXPO_PUBLIC_ENVIRONMENT=development
+EXPO_PUBLIC_APP_VERSION="1.0.0"
+EXPO_PUBLIC_BUILD_NUMBER="1"
+EXPO_PUBLIC_ENVIRONMENT="development"
 
-# =====================================================
-# FEATURE FLAGS
-# =====================================================
-EXPO_PUBLIC_ENABLE_DARK_MODE=${config.features.enableDarkMode}
-EXPO_PUBLIC_ENABLE_HAPTICS=${config.features.enableHaptics}
-EXPO_PUBLIC_ENABLE_ANIMATIONS=${config.features.enableAnimations}
+# =============================================================================
+# CORE FEATURES (ALL ENABLED BY DEFAULT)
+# =============================================================================
 
-# Template features (to be implemented)
-EXPO_PUBLIC_ENABLE_AUTH=${config.features.enableAuth}
-EXPO_PUBLIC_ENABLE_STORAGE=${config.features.enableStorage}
-EXPO_PUBLIC_ENABLE_ONBOARDING=${config.features.enableOnboarding}
-EXPO_PUBLIC_ENABLE_PROFILE=${config.features.enableProfile}
-EXPO_PUBLIC_ENABLE_SIDEBAR=${config.features.enableSidebar}
-EXPO_PUBLIC_ENABLE_ANALYTICS=${config.features.enableAnalytics}
+# Authentication & User Management
+EXPO_PUBLIC_ENABLE_AUTH=true
+EXPO_PUBLIC_ENABLE_EMAIL_AUTH=true
+EXPO_PUBLIC_ENABLE_PROFILE=true
+EXPO_PUBLIC_ENABLE_PROFILE_MANAGEMENT=true
 
-# =====================================================
-# BRANDING
-# =====================================================
-EXPO_PUBLIC_PRIMARY_COLOR="${config.primaryColor}"
-EXPO_PUBLIC_SECONDARY_COLOR=#64748B
-EXPO_PUBLIC_THEME_MODE="${config.themeMode}"
+# Conversation Management System
+EXPO_PUBLIC_ENABLE_CONVERSATION_MANAGEMENT=true
+EXPO_PUBLIC_ENABLE_CONVERSATION_ANALYTICS=true
+EXPO_PUBLIC_ENABLE_CONVERSATION_SHARING=true
 
-# =====================================================
+# Navigation & Layout
+EXPO_PUBLIC_ENABLE_ONBOARDING=true
+EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING=true
+EXPO_PUBLIC_ENABLE_SIDEBAR=true
+EXPO_PUBLIC_ENABLE_THEME_CUSTOMIZATION=true
+
+# UI Features
+EXPO_PUBLIC_ENABLE_DARK_MODE=true
+EXPO_PUBLIC_ENABLE_ANIMATIONS=true
+EXPO_PUBLIC_ENABLE_HAPTICS=true
+
+# =============================================================================
+# FUTURE FEATURES (DISABLED BY DEFAULT)
+# =============================================================================
+# Uncomment and set to true to enable when implemented
+
+# Social Authentication
+# EXPO_PUBLIC_ENABLE_SOCIAL_AUTH=false
+# EXPO_PUBLIC_ENABLE_GOOGLE_AUTH=false
+# EXPO_PUBLIC_ENABLE_APPLE_AUTH=false
+
+# File Storage & Uploads
+# EXPO_PUBLIC_ENABLE_STORAGE=false
+# EXPO_PUBLIC_ENABLE_FILE_UPLOADS=false
+
+# Advanced Features
+# EXPO_PUBLIC_ENABLE_PUSH_NOTIFICATIONS=false
+# EXPO_PUBLIC_ENABLE_OFFLINE=false
+# EXPO_PUBLIC_ENABLE_REALTIME=false
+# EXPO_PUBLIC_ENABLE_VOICE=false
+
+# =============================================================================
+# BRANDING & THEMING
+# =============================================================================
+EXPO_PUBLIC_PRIMARY_COLOR="#3B82F6"
+EXPO_PUBLIC_SECONDARY_COLOR="#64748B"
+EXPO_PUBLIC_THEME_MODE="system"
+
+# =============================================================================
 # API CONFIGURATION
-# =====================================================
-EXPO_PUBLIC_API_URL=http://localhost:8081
+# =============================================================================
+EXPO_PUBLIC_API_URL="http://localhost:8081"
 
-# =====================================================
-# THIRD-PARTY SERVICES
-# =====================================================
-# TODO: Add your API keys below
+# =============================================================================
+# REQUIRED API KEYS
+# =============================================================================
 
-# OpenAI (required for AI chat features)
-OPENAI_API_KEY=your_openai_api_key_here
+# OpenAI (Required for AI chat features)
+OPENAI_API_KEY="${config.openaiConfig?.apiKey || 'your_openai_api_key_here'}"
 
-# Supabase (required for auth and storage features)
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+# Supabase (Required for auth, conversations, analytics, sharing)
+EXPO_PUBLIC_SUPABASE_URL="${config.supabaseConfig?.url || 'your_supabase_project_url'}"
+EXPO_PUBLIC_SUPABASE_ANON_KEY="${config.supabaseConfig?.anonKey || 'your_supabase_anon_key'}"
+SUPABASE_SERVICE_ROLE_KEY="${config.supabaseConfig?.serviceKey || 'your_supabase_service_role_key'}"
+
+# =============================================================================
+# FEATURE-SPECIFIC CONFIGURATION
+# =============================================================================
+EXPO_PUBLIC_MAX_MESSAGE_LENGTH="4000"
+EXPO_PUBLIC_CHAT_HISTORY_LIMIT="100"
+EXPO_PUBLIC_ANALYTICS_RETENTION_DAYS="90"
+EXPO_PUBLIC_ENABLE_USAGE_TRACKING="true"
+
+# =============================================================================
+# DEVELOPMENT CONFIGURATION
+# =============================================================================
+EXPO_PUBLIC_DEBUG_MODE="false"
+EXPO_PUBLIC_LOG_LEVEL="info"
+EXPO_PUBLIC_ENABLE_DEV_TOOLS="true"
 `;
 
   fs.writeFileSync(envPath, envContent);
@@ -241,45 +295,71 @@ async function updatePackageJson(config) {
   }
 }
 
-async function setupSupabasePrompt() {
-  log.info('\nSupabase Setup:');
-  console.log('1. Go to https://supabase.com and create a new project');
-  console.log('2. Copy your project URL and anon key from Settings > API');
-  console.log('3. Update the SUPABASE_* variables in your .env.local file');
+async function generateReadme(config) {
+  const templatePath = path.join(process.cwd(), 'TEMPLATE_README.md');
+  const readmePath = path.join(process.cwd(), 'README.md');
+
+  if (fs.existsSync(templatePath)) {
+    let readmeContent = fs.readFileSync(templatePath, 'utf8');
+
+    // Replace template placeholders
+    readmeContent = readmeContent.replace(/{{APP_NAME}}/g, config.appName);
+    readmeContent = readmeContent.replace(/{{APP_SLUG}}/g, config.appSlug);
+
+    fs.writeFileSync(readmePath, readmeContent);
+    log.success('Generated README.md from template');
+  }
 }
 
-async function setupOpenAIPrompt() {
-  log.info('\nOpenAI Setup:');
-  console.log('1. Go to https://platform.openai.com/api-keys');
-  console.log('2. Create a new API key');
-  console.log('3. Update the OPENAI_API_KEY in your .env.local file');
-}
+function showCompletionMessage(config) {
+  log.title('🎉 Setup Complete!');
 
-function showCompletionMessage({ hasSupabase, hasOpenAI, features }) {
-  log.title('Setup Complete! 🎉');
+  console.log(`${colors.bright}Your "${config.appName}" app is ready!${colors.reset}\n`);
 
-  console.log('Your template has been configured successfully.\n');
+  log.success('All core features are enabled and ready to use:');
+  console.log('  ✅ Authentication & User Management');
+  console.log('  ✅ AI Chat with Conversation Management');
+  console.log('  ✅ Analytics Dashboard');
+  console.log('  ✅ Conversation Sharing');
+  console.log('  ✅ Theme Customization & Navigation');
+  console.log();
 
   log.info('Next Steps:');
 
-  if (!hasSupabase && (features.enableAuth || features.enableStorage)) {
-    console.log('1. 📝 Set up Supabase credentials in .env.local (required for auth/storage)');
+  if (!config.hasSupabase) {
+    console.log('1. 🔧 Set up Supabase:');
+    console.log('   • Go to https://supabase.com and create a new project');
+    console.log('   • Run the SQL migration in supabase/migrations/');
+    console.log('   • Update Supabase credentials in .env.local');
   }
 
-  if (!hasOpenAI) {
-    console.log('2. 🔑 Add your OpenAI API key to .env.local (required for AI chat)');
+  if (!config.hasOpenAI) {
+    console.log('2. 🤖 Set up OpenAI:');
+    console.log('   • Go to https://platform.openai.com/api-keys');
+    console.log('   • Create a new API key');
+    console.log('   • Update OPENAI_API_KEY in .env.local');
   }
 
-  console.log('3. 🚀 Start development: npm run start');
-  console.log('4. 📱 Choose your platform: npm run ios | npm run android | npm run web');
-  console.log('5. 📖 Check the docs folder for feature guides\n');
+  console.log('3. 🚀 Start development:');
+  console.log('   npm run start');
+  console.log();
+  console.log('4. 📱 Choose your platform:');
+  console.log('   npm run ios     # iOS simulator');
+  console.log('   npm run android # Android emulator');
+  console.log('   npm run web     # Web browser');
+  console.log();
 
-  if (Object.values(features).some(Boolean)) {
-    log.warning('Note: Some features are enabled but not yet implemented.');
-    log.info('These will be available in future template updates.');
-  }
+  log.info('Customization:');
+  console.log('📝 Edit .env.local to customize features and branding');
+  console.log('📖 See docs/FEATURES.md for all available options');
+  console.log('🎨 Modify colors, themes, and feature flags as needed');
+  console.log();
 
   log.success('Happy coding! 🚀');
+
+  console.log(
+    `\n${colors.yellow}💡 Tip: All core features are enabled by default. You can disable or customize them in .env.local${colors.reset}`
+  );
 }
 
 // Run the setup if this script is executed directly

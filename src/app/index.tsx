@@ -1,39 +1,29 @@
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/features/auth';
 import { FEATURES } from '@/config/features';
-import { useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 
 export default function IndexScreen() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  // Add logging to debug initial routing
-  useEffect(() => {
-    console.log('[INDEX] Initial routing decision:', {
-      isAuthenticated,
-      isLoading,
-      userId: user?.id,
-      enableAuth: FEATURES.enableAuth,
-    });
-  }, [isAuthenticated, isLoading, user]);
-
-  // Don't render anything while loading - splash is handled by _layout
+  // Show loading indicator while auth is bootstrapping
   if (isLoading) {
-    console.log('[INDEX] Loading - showing splash');
-    return null;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
-  // If auth is disabled, go directly to app
+  // Auth is disabled - go to app
   if (!FEATURES.enableAuth) {
-    console.log('[INDEX] Auth disabled - redirecting to app');
     return <Redirect href="/(app)" />;
   }
 
-  // Redirect based on auth state
+  // Declarative navigation based on auth state
   if (isAuthenticated) {
-    console.log('[INDEX] User authenticated - redirecting to app');
     return <Redirect href="/(app)" />;
+  } else {
+    return <Redirect href="/(auth)/welcome" />;
   }
-
-  console.log('[INDEX] User not authenticated - redirecting to auth');
-  return <Redirect href="/(auth)/welcome" />;
 }

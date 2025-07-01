@@ -54,7 +54,8 @@ export function AuthForm() {
               onChangeText={setFullName}
               placeholder="John Doe"
               placeholderTextColor={isDark ? '#71717a' : '#a1a1aa'}
-              className="w-full px-4 py-4 bg-input rounded-xl text-base text-foreground border border-border"
+              className="w-full px-4 bg-input rounded-xl text-base text-foreground border border-border"
+              style={{ minHeight: 56, textAlignVertical: 'center', paddingVertical: 16 }}
               autoCapitalize="words"
             />
           </View>
@@ -67,7 +68,8 @@ export function AuthForm() {
             onChangeText={setEmail}
             placeholder="you@example.com"
             placeholderTextColor={isDark ? '#71717a' : '#a1a1aa'}
-            className="w-full px-4 py-4 bg-input rounded-xl text-base text-foreground border border-border"
+            className="w-full px-4 bg-input rounded-xl text-base text-foreground border border-border"
+            style={{ minHeight: 56, textAlignVertical: 'center', paddingVertical: 16 }}
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
@@ -81,7 +83,8 @@ export function AuthForm() {
             onChangeText={setPassword}
             placeholder="••••••••"
             placeholderTextColor={isDark ? '#71717a' : '#a1a1aa'}
-            className="w-full px-4 py-4 bg-input rounded-xl text-base text-foreground border border-border"
+            className="w-full px-4 bg-input rounded-xl text-base text-foreground border border-border"
+            style={{ minHeight: 56, textAlignVertical: 'center', paddingVertical: 16 }}
             secureTextEntry
             autoComplete="password"
           />

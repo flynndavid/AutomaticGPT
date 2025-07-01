@@ -1,4 +1,4 @@
-# Automatic ExpoGPT Template
+# {{APP_NAME}}
 
 A modern AI-powered mobile and web application built with Expo, featuring authentication, conversation management, analytics, and sharing capabilities.
 
@@ -96,8 +96,8 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY="your_supabase_anon_key"
 SUPABASE_SERVICE_ROLE_KEY="your_service_role_key"
 
 # App Configuration
-EXPO_PUBLIC_APP_NAME="Automatic ExpoGPT Template"
-EXPO_PUBLIC_APP_SLUG="automatic-expogpt-template"
+EXPO_PUBLIC_APP_NAME="{{APP_NAME}}"
+EXPO_PUBLIC_APP_SLUG="{{APP_SLUG}}"
 
 # Feature Flags (all implemented features default to true)
 EXPO_PUBLIC_ENABLE_AUTH=true

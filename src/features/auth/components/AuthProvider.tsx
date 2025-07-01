@@ -1,6 +1,7 @@
 /**
  * AuthProvider Component
  * Provides authentication context to the entire app
+ * Refactored to use onAuthStateChange as single source of truth
  */
 
 import React, { createContext, useEffect, useState, ReactNode, useRef, useCallback } from 'react';
@@ -28,81 +29,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     error: null,
   });
 
-  // Track initialization and active operations
-  const [isInitializing, setIsInitializing] = useState(true);
-  const [activeOperations, setActiveOperations] = useState<Set<string>>(new Set());
-  const [profileLoading, setProfileLoading] = useState<Set<string>>(new Set());
+  // Track if we've received the initial session event
+  const [bootstrapped, setBootstrapped] = useState(false);
+  const profileLoadingRef = useRef<Set<string>>(new Set());
   const mountedRef = useRef(true);
 
-  // Operation tracking helpers
-  const startOperation = (operationId: string) => {
-    setActiveOperations((prev) => new Set([...prev, operationId]));
-    setState((prev) => ({ ...prev, isLoading: true }));
-  };
-
-  const completeOperation = (operationId: string) => {
-    setActiveOperations((prev) => {
-      const next = new Set(prev);
-      next.delete(operationId);
-      if (next.size === 0) {
-        setState((prev) => ({ ...prev, isLoading: false }));
-      }
-      return next;
-    });
-  };
+  // Enhanced Stage 2: Initialization guard using ref
+  const initializationRef = useRef(false);
 
   // Load user profile
-  const loadProfile = useCallback(
-    async (userId: string): Promise<Profile | null> => {
-      // Prevent duplicate profile loading requests
-      if (profileLoading.has(userId)) {
-        console.log(
-          `[AUTH] Profile already loading for user ${userId}, skipping duplicate request`
-        );
-        return null;
-      }
+  const loadProfile = useCallback(async (userId: string): Promise<Profile | null> => {
+    // Prevent duplicate profile loading requests
+    if (profileLoadingRef.current.has(userId)) {
+      console.log(`[AUTH] Profile already loading for user ${userId}, skipping duplicate request`);
+      return null;
+    }
 
-      try {
-        setProfileLoading((prev) => new Set([...prev, userId]));
+    try {
+      profileLoadingRef.current.add(userId);
 
-        const { data: profile, error } = await db.getProfile(userId);
-        if (error) {
-          // Handle specific error cases
-          if (error.message?.includes('JSON object requested, multiple (or no) rows returned')) {
-            // No rows returned - profile doesn't exist
-            console.warn(
-              `[AUTH] No profile found for user ${userId}. This may be expected for new users.`
-            );
-            return null;
-          } else {
-            console.warn('[AUTH] Failed to load profile:', error.message);
-            return null;
-          }
+      const { data: profile, error } = await db.getProfile(userId);
+      if (error) {
+        // Handle specific error cases
+        if (error.message?.includes('JSON object requested, multiple (or no) rows returned')) {
+          // No rows returned - profile doesn't exist
+          console.warn(
+            `[AUTH] No profile found for user ${userId}. This may be expected for new users.`
+          );
+          return null;
+        } else {
+          console.warn('[AUTH] Failed to load profile:', error.message);
+          return null;
         }
-        return profile;
-      } catch (error) {
-        console.warn('[AUTH] Error loading profile:', error);
-        return null;
-      } finally {
-        setProfileLoading((prev) => {
-          const next = new Set(prev);
-          next.delete(userId);
-          return next;
-        });
       }
-    },
-    [] // Remove profileLoading dependency to prevent infinite re-creation
-  );
+      return profile;
+    } catch (error) {
+      console.warn('[AUTH] Error loading profile:', error);
+      return null;
+    } finally {
+      profileLoadingRef.current.delete(userId);
+    }
+  }, []);
 
   // Initialize authentication state
   useEffect(() => {
+    // Enhanced Stage 2: Prevent double initialization
+    if (initializationRef.current) return;
+    initializationRef.current = true;
+
     let mounted = true;
     let subscription: any = null;
     mountedRef.current = true;
 
     const initializeAuth = async () => {
       try {
-        setIsInitializing(true);
+        console.log('[AUTH] Initializing auth with onAuthStateChange pattern...');
 
         // Check if Supabase is configured
         if (!isSupabaseConfigured()) {
@@ -114,61 +95,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               isLoading: false,
               error: null,
             }));
-            setIsInitializing(false);
+            setBootstrapped(true);
           }
           return;
         }
 
-        // Get initial session with timeout
-        const { session, error } = await auth.getSession();
-
-        if (error) {
-          console.warn('[AUTH] Session error:', error.message);
-          throw new Error(error.message);
-        }
-
-        // Set auth state immediately, load profile in background
-        if (mounted) {
-          setState((prev) => ({
-            ...prev,
-            isAuthenticated: !!session,
-            user: session?.user || null,
-            session,
-            profile: null, // Start with null, will be loaded async
-            isLoading: false,
-          }));
-        }
-
-        // Load profile in background (non-blocking)
-        if (session?.user && mounted) {
-          loadProfile(session.user.id)
-            .then((profile) => {
-              if (mounted) {
-                setState((prev) => ({
-                  ...prev,
-                  profile,
-                }));
-              }
-            })
-            .catch((error) => {
-              console.warn('[AUTH] Initial profile loading failed:', error);
-            });
-        }
-
-        // Only set up auth listener after initial session check completes
+        // Set up auth listener as the single source of truth
         if (mounted && supabase) {
           try {
             const {
               data: { subscription: authSubscription },
             } = supabase.auth.onAuthStateChange(async (event, session) => {
-              // Don't process auth changes during initialization
-              if (isInitializing) {
-                return;
-              }
-
               console.log(`[AUTH] Auth state change: ${event}`);
 
-              // Update auth state immediately, load profile in background
+              // Update auth state immediately
               if (mountedRef.current) {
                 setState((prev) => ({
                   ...prev,
@@ -177,8 +117,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                   session,
                   profile: null, // Start with null, will be loaded async
                   isLoading: false,
-                  error: null, // Clear errors on auth state change
+                  error: null,
                 }));
+
+                // Mark as bootstrapped after first event (INITIAL_SESSION)
+                if (!bootstrapped) {
+                  setBootstrapped(true);
+                }
               }
 
               // Load profile in background (non-blocking)
@@ -199,16 +144,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
 
             subscription = authSubscription;
+            console.log('[AUTH] Auth listener initialized successfully');
           } catch (listenerError) {
             console.error('[AUTH] Failed to set up auth listener:', listenerError);
-          }
-
-          if (mounted) {
-            setIsInitializing(false);
-          }
-        } else {
-          if (mounted) {
-            setIsInitializing(false);
+            // Fallback: disable auth instead of blocking the app
+            if (mounted) {
+              setState((prev) => ({
+                ...prev,
+                isAuthenticated: false,
+                isLoading: false,
+                error: null,
+              }));
+              setBootstrapped(true);
+            }
           }
         }
       } catch (error) {
@@ -219,9 +167,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             ...prev,
             isAuthenticated: false,
             isLoading: false,
-            error: null, // Don't show error, just disable auth
+            error: null,
           }));
-          setIsInitializing(false);
+          setBootstrapped(true);
         }
       }
     };
@@ -232,7 +180,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       mounted = false;
       mountedRef.current = false;
 
-      // Always cleanup subscription if it exists, regardless of configuration state
+      // Always cleanup subscription if it exists
       if (subscription) {
         try {
           subscription.unsubscribe();
@@ -242,21 +190,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
     };
-  }, [loadProfile]);
+  }, [loadProfile, bootstrapped]);
 
-  // Authentication actions
+  // Authentication actions - simplified without complex loading state management
   const signIn = async (email: string, password: string): Promise<void> => {
-    const operationId = 'signIn';
     try {
-      startOperation(operationId);
       setState((prev) => ({ ...prev, error: null }));
 
       const { error } = await auth.signIn(email, password);
       if (error) throw error;
 
-      // Don't complete operation here - wait for auth state change
+      // Don't manage loading state - auth listener will update UI
+      console.log('[AUTH] Sign in request sent, waiting for auth state change...');
     } catch (error) {
-      completeOperation(operationId);
       setState((prev) => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Sign in failed',
@@ -270,9 +216,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string,
     profileData?: ProfileCreateData
   ): Promise<void> => {
-    const operationId = 'signUp';
     try {
-      startOperation(operationId);
       setState((prev) => ({ ...prev, error: null }));
 
       // Step 1: Create auth user
@@ -298,7 +242,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (!data.user) throw new Error('Failed to create user');
 
       // Step 2: Verify profile creation (wait for database trigger)
-      await new Promise((resolve) => setTimeout(resolve, 100)); // Reduced from 1000ms to 100ms
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const { data: profile, error: profileError } = await supabase!
         .from('profiles')
@@ -319,15 +263,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
 
         if (manualProfileError) {
-          // Rollback: attempt to delete auth user (may not work without admin privileges)
           console.error('[AUTH] Profile creation failed, user may be in inconsistent state');
           throw new Error('Failed to create user profile');
         }
       }
 
-      // Don't complete operation here - wait for auth state change
+      // Don't manage loading state - auth listener will update UI
+      console.log('[AUTH] Sign up request sent, waiting for auth state change...');
     } catch (error) {
-      completeOperation(operationId);
       setState((prev) => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Sign up failed',
@@ -337,17 +280,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signOut = useCallback(async (): Promise<void> => {
-    const operationId = 'signOut';
     try {
-      startOperation(operationId);
       setState((prev) => ({ ...prev, error: null }));
 
       const { error } = await auth.signOut();
       if (error) throw error;
 
-      // Don't complete operation here - wait for auth state change
+      // Don't manage loading state - auth listener will update UI
+      console.log('[AUTH] Sign out request sent, waiting for auth state change...');
     } catch (error) {
-      completeOperation(operationId);
       setState((prev) => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Sign out failed',
@@ -357,17 +298,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const resetPassword = async (email: string): Promise<void> => {
-    const operationId = 'resetPassword';
     try {
-      startOperation(operationId);
       setState((prev) => ({ ...prev, error: null }));
 
       const { error } = await auth.resetPassword(email);
       if (error) throw error;
-
-      completeOperation(operationId);
     } catch (error) {
-      completeOperation(operationId);
       setState((prev) => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Password reset failed',
@@ -443,63 +379,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     }
   }, [signOut, loadProfile]);
-
-  // Complete operations when auth state changes (but not during initialization)
-  useEffect(() => {
-    if (!isInitializing && activeOperations.size > 0) {
-      // Complete all active operations when auth state changes
-      const currentOperations = Array.from(activeOperations);
-      setActiveOperations(new Set());
-      setState((prev) => ({ ...prev, isLoading: false }));
-      console.log('[AUTH] Cleared operations on auth state change:', currentOperations);
-    }
-  }, [state.isAuthenticated, state.user?.id, isInitializing]);
-
-  // Add timeout handling for stuck operations
-  useEffect(() => {
-    if (activeOperations.size > 0) {
-      const timeout = setTimeout(() => {
-        console.warn(
-          '[AUTH] Operations timeout, clearing stuck operations:',
-          Array.from(activeOperations)
-        );
-        setActiveOperations(new Set());
-        setState((prev) => ({ ...prev, isLoading: false }));
-      }, 30000); // 30 second timeout
-
-      return () => clearTimeout(timeout);
-    }
-  }, [activeOperations]);
-
-  // Automatic session refresh
-  useEffect(() => {
-    if (!isSupabaseConfigured() || !state.session) {
-      return;
-    }
-
-    const checkAndRefreshSession = async () => {
-      try {
-        const expiresAt = state.session?.expires_at;
-        if (!expiresAt) return;
-
-        const now = Math.floor(Date.now() / 1000);
-        const timeUntilExpiry = expiresAt - now;
-
-        // Refresh session 5 minutes before expiry
-        if (timeUntilExpiry <= 300) {
-          console.log('[AUTH] Session expiring soon, refreshing...');
-          await refreshSession();
-        }
-      } catch (error) {
-        console.warn('[AUTH] Session refresh check failed:', error);
-      }
-    };
-
-    // Check session every minute
-    const interval = setInterval(checkAndRefreshSession, 60000);
-
-    return () => clearInterval(interval);
-  }, [state.session, refreshSession]);
 
   // Context value
   const value: AuthContextType = {

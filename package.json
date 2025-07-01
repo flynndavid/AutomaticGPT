@@ -1,7 +1,61 @@
 {
-  "name": "automatic-sandbox-expo-1",
+  "name": "automatic-expogpt-template",
   "version": "1.0.0",
+  "description": "Automatic ExpoGPT Template - A production-ready Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
   "main": "expo-router/entry",
+  "keywords": [
+    "expo",
+    "template",
+    "react-native",
+    "ai",
+    "chat",
+    "openai",
+    "supabase",
+    "authentication",
+    "typescript",
+    "nativewind",
+    "tailwind",
+    "conversation-management",
+    "analytics",
+    "sharing",
+    "mobile",
+    "web",
+    "cross-platform"
+  ],
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/expo-ai-template"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/expo-ai-template/issues"
+  },
+  "homepage": "https://github.com/yourusername/expo-ai-template#readme",
+  "expo": {
+    "template": {
+      "name": "Automatic ExpoGPT Template",
+      "description": "A comprehensive Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
+      "icon": "./assets/images/logo_icon.png",
+      "category": "ai",
+      "features": [
+        "Authentication & User Management",
+        "AI Chat with OpenAI GPT-4o",
+        "Conversation Management System",
+        "Analytics Dashboard",
+        "Conversation Sharing",
+        "Navigation & Layout",
+        "Theme Customization",
+        "TypeScript",
+        "NativeWind (Tailwind CSS)",
+        "Supabase Integration",
+        "Cross-platform (iOS, Android, Web)"
+      ]
+    }
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -9,6 +63,7 @@
     "web": "expo start --web",
     "deploy": "npx expo export -p web && npx eas-cli@latest deploy",
     "setup": "node scripts/setup.js",
+    "postinstall": "node scripts/setup.js",
     "prepare": "husky",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
@@ -85,5 +140,5 @@
       "prettier --write"
     ]
   },
-  "private": true
+  "private": false
 }

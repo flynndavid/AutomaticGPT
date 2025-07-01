@@ -4,6 +4,7 @@
  */
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppState } from 'react-native';
 import 'react-native-url-polyfill/auto';
 
 /**
@@ -721,6 +722,10 @@ export const realtime = {
    * Subscribe to profile changes
    */
   subscribeToProfile: (userId: string, callback: (payload: any) => void) => {
+    if (!supabase) {
+      console.warn('[REALTIME] Supabase not configured');
+      return null;
+    }
     return supabase
       .channel('profile-changes')
       .on(
@@ -740,6 +745,10 @@ export const realtime = {
    * Unsubscribe from all channels
    */
   unsubscribeAll: () => {
+    if (!supabase) {
+      console.warn('[REALTIME] Supabase not configured');
+      return;
+    }
     supabase.removeAllChannels();
   },
 };
@@ -752,6 +761,9 @@ export const storage = {
    * Upload file to storage bucket
    */
   uploadFile: async (bucket: string, path: string, file: File | ArrayBuffer, options?: any) => {
+    if (!supabase) {
+      return { data: null, error: { message: 'Supabase not configured' } };
+    }
     const { data, error } = await supabase.storage.from(bucket).upload(path, file, options);
     return { data, error };
   },
@@ -760,6 +772,9 @@ export const storage = {
    * Download file from storage bucket
    */
   downloadFile: async (bucket: string, path: string) => {
+    if (!supabase) {
+      return { data: null, error: { message: 'Supabase not configured' } };
+    }
     const { data, error } = await supabase.storage.from(bucket).download(path);
     return { data, error };
   },
@@ -768,6 +783,9 @@ export const storage = {
    * Get public URL for file
    */
   getPublicUrl: (bucket: string, path: string) => {
+    if (!supabase) {
+      return '';
+    }
     const { data } = supabase.storage.from(bucket).getPublicUrl(path);
     return data.publicUrl;
   },
@@ -776,6 +794,9 @@ export const storage = {
    * Delete file from storage bucket
    */
   deleteFile: async (bucket: string, paths: string[]) => {
+    if (!supabase) {
+      return { data: null, error: { message: 'Supabase not configured' } };
+    }
     const { data, error } = await supabase.storage.from(bucket).remove(paths);
     return { data, error };
   },
@@ -793,5 +814,21 @@ export type Message = Database['public']['Tables']['messages']['Row'];
 export type ConversationShare = Database['public']['Tables']['conversation_shares']['Row'];
 export type MessageRole = Database['public']['Enums']['message_role'];
 export type ConversationStatus = Database['public']['Enums']['conversation_status'];
+
+/**
+ * AppState-aware auto-refresh setup
+ * Manages token refresh based on app foreground/background state
+ */
+if (supabase) {
+  AppState.addEventListener('change', (state) => {
+    if (state === 'active') {
+      console.log('[SUPABASE] App became active, starting auto-refresh');
+      supabase.auth.startAutoRefresh();
+    } else {
+      console.log('[SUPABASE] App became inactive, stopping auto-refresh');
+      supabase.auth.stopAutoRefresh();
+    }
+  });
+}
 
 export default supabase;

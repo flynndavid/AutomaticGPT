@@ -362,6 +362,27 @@ export function Sidebar({
           className="bg-card rounded-t-3xl shadow-lg border-t border-border/10"
           style={{ paddingBottom: insets.bottom }}
         >
+          {/* Profile Dropdown Menu */}
+          {isProfileMenuOpen && (
+            <View className="border-b border-border/50">
+              {profileMenuItems.map((item) => (
+                <Pressable
+                  key={item.id}
+                  onPress={() => handleProfileMenuPress(item.id)}
+                  className="flex-row items-center px-6 py-3 active:bg-muted"
+                >
+                  <Ionicons name={item.icon as any} size={18} color={isDark ? '#9ca3af' : '#666'} />
+                  <Text className="ml-3 text-sm font-medium text-foreground">
+                    {item.label}
+                    {item.id === 'theme' && (
+                      <Text className="text-muted-foreground"> ({isDark ? 'Dark' : 'Light'})</Text>
+                    )}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+
           <Pressable onPress={handleProfilePress} className="flex-row items-center px-6 py-4">
             <View className="w-10 h-10 rounded-full bg-primary items-center justify-center mr-3">
               {userAvatar ? (
@@ -386,27 +407,6 @@ export function Sidebar({
               color={isDark ? '#9ca3af' : '#666'}
             />
           </Pressable>
-
-          {/* Profile Dropdown Menu */}
-          {isProfileMenuOpen && (
-            <View className="border-t border-border/50">
-              {profileMenuItems.map((item) => (
-                <Pressable
-                  key={item.id}
-                  onPress={() => handleProfileMenuPress(item.id)}
-                  className="flex-row items-center px-6 py-3 active:bg-muted"
-                >
-                  <Ionicons name={item.icon as any} size={18} color={isDark ? '#9ca3af' : '#666'} />
-                  <Text className="ml-3 text-sm font-medium text-foreground">
-                    {item.label}
-                    {item.id === 'theme' && (
-                      <Text className="text-muted-foreground"> ({isDark ? 'Dark' : 'Light'})</Text>
-                    )}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
         </View>
       </Animated.View>
 

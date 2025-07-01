@@ -7,7 +7,7 @@
       "output": "server"
     },
     "plugins": ["expo-router"],
-    "name": "automatic-sandbox-expo-1",
-    "slug": "automatic-sandbox-expo-1"
+    "name": "Automatic ExpoGPT Template",
+    "slug": "automatic-expogpt-template"
   }
 }

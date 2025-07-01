@@ -4,22 +4,16 @@
       "command": "npx",
       "args": ["-y", "--package=task-master-ai", "task-master-ai"],
       "env": {
-        "ANTHROPIC_API_KEY": "",
-        "PERPLEXITY_API_KEY": "",
-        "OPENAI_API_KEY": "",
-        "GOOGLE_API_KEY": "",
-        "XAI_API_KEY": "",
-        "OPENROUTER_API_KEY": "",
-        "MISTRAL_API_KEY": "",
-        "AZURE_OPENAI_API_KEY": "",
-        "OLLAMA_API_KEY": ""
+        "OPENAI_API_KEY": "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",
+        "ANTHROPIC_API_KEY": "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"
       }
     },
     "supabase": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-supabase"],
+      "args": ["-y", "@supabase/mcp-server-supabase"],
       "env": {
-        "SUPABASE_ACCESS_TOKEN": ""
+        "SUPABASE_ACCESS_TOKEN": "sbp_f4ea2c202dd124d792fdef2853b80f591ab729de",
+        "SUPABASE_PROJECT_REF": "hjzkrzdlhhaxyptgkkhu"
       }
     }
   }
