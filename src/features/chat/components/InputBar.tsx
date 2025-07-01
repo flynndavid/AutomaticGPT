@@ -1,7 +1,9 @@
-import { TextInput, View, Pressable, ActivityIndicator } from 'react-native';
+import { TextInput, View, Pressable, ActivityIndicator, ScrollView, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/features/shared';
+import { FileAttachment } from '@/types/api';
+import { FilePreview } from './FilePreview';
 
 interface InputBarProps {
   input: string;
@@ -10,6 +12,9 @@ interface InputBarProps {
   isLoading: boolean;
   onVoicePress?: () => void;
   onPlusPress?: () => void;
+  attachments?: FileAttachment[];
+  onRemoveAttachment?: (id: string) => void;
+  canSend?: boolean;
 }
 
 export function InputBar({
@@ -19,8 +24,13 @@ export function InputBar({
   isLoading,
   onVoicePress,
   onPlusPress,
+  attachments = [],
+  onRemoveAttachment,
+  canSend: canSendProp,
 }: InputBarProps) {
-  const canSend = input.trim() && !isLoading;
+  const hasContent = input.trim() || attachments.length > 0;
+  const allFilesUploaded = attachments.length === 0 || attachments.every(file => file.uploadStatus === 'uploaded');
+  const canSend = canSendProp !== undefined ? canSendProp : (hasContent && !isLoading && allFilesUploaded);
   const { isDark } = useTheme();
   const { bottom } = useSafeAreaInsets();
 
@@ -30,10 +40,28 @@ export function InputBar({
       style={{ paddingBottom: bottom }}
     >
       <View className="px-4 pt-4 pb-2">
+        {/* File attachments preview */}
+        {attachments.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mb-3"
+            contentContainerStyle={{ paddingRight: 16 }}
+          >
+            {attachments.map((file) => (
+              <FilePreview
+                key={file.id}
+                file={file}
+                onRemove={onRemoveAttachment || (() => {})}
+              />
+            ))}
+          </ScrollView>
+        )}
+
         {/* Full width input field */}
         <TextInput
           className="text-lg leading-6 px-4 py-3 text-foreground max-h-[120px] min-h-[48px]"
-          placeholder="Ask anything"
+          placeholder={attachments.length > 0 ? "Add a message..." : "Ask anything"}
           placeholderTextColor={isDark ? '#6b7280' : '#999'}
           value={input}
           onChangeText={onInputChange}
@@ -46,7 +74,11 @@ export function InputBar({
         {/* Button row below input */}
         <View className="flex-row items-center justify-between pt-2">
           <Pressable onPress={onPlusPress} className="w-12 h-12 items-center justify-center">
-            <Ionicons name="add" size={28} color={isDark ? '#9ca3af' : '#666'} />
+            <Ionicons 
+              name={attachments.length > 0 ? "add-circle" : "add"} 
+              size={28} 
+              color={attachments.length > 0 ? '#3b82f6' : (isDark ? '#9ca3af' : '#666')} 
+            />
           </Pressable>
 
           <View className="flex-row items-center gap-3">
@@ -69,6 +101,16 @@ export function InputBar({
             </Pressable>
           </View>
         </View>
+
+        {/* Upload status indicator */}
+        {attachments.length > 0 && !allFilesUploaded && (
+          <View className="flex-row items-center mt-2 px-2">
+            <ActivityIndicator size="small" color={isDark ? '#9ca3af' : '#6b7280'} />
+            <Text className="text-xs text-muted-foreground ml-2">
+              Uploading files...
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );

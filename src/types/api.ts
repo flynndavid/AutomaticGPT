@@ -1,10 +1,25 @@
 import { z } from 'zod';
 
+// File attachment schema
+export const FileAttachmentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.string(),
+  size: z.number(),
+  uri: z.string(),
+  supabaseUrl: z.string().optional(),
+  uploadStatus: z.enum(['pending', 'uploading', 'uploaded', 'error']).default('pending'),
+  uploadProgress: z.number().min(0).max(100).optional(),
+  thumbnailUri: z.string().optional(),
+  error: z.string().optional(),
+});
+
 // Chat API request/response schemas - compatible with AI SDK
 export const ChatMessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
   content: z.string(),
   id: z.string().optional(),
+  attachments: z.array(FileAttachmentSchema).optional(),
 });
 
 export const ChatRequestSchema = z.object({
@@ -67,6 +82,7 @@ export const ErrorResponseSchema = z.object({
 });
 
 // Inferred types from schemas
+export type FileAttachment = z.infer<typeof FileAttachmentSchema>;
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 export type ChatRequest = z.infer<typeof ChatRequestSchema>;
 export type ChatResponse = z.infer<typeof ChatResponseSchema>;

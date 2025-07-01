@@ -7,8 +7,63 @@ import {
   CelsiusConvertToolSchema,
   WeatherResultSchema,
   CelsiusConvertResultSchema,
+  FileAttachment,
 } from '@/types/api';
 import { db } from '@/lib/supabase';
+import { convertImageToBase64, readTextFile, getFileTypeCategory } from '@/lib/fileUpload';
+
+/**
+ * Process file attachments for AI model consumption
+ */
+async function processAttachments(attachments?: FileAttachment[]) {
+  if (!attachments?.length) return [];
+
+  const processedContent = [];
+
+  for (const attachment of attachments) {
+    try {
+      const fileType = getFileTypeCategory(attachment.type);
+      
+      if (fileType === 'image' && attachment.supabaseUrl) {
+        // For images, convert to base64 for vision model
+        const base64Image = await convertImageToBase64(attachment.supabaseUrl);
+        processedContent.push({
+          type: 'image',
+          image: base64Image,
+        });
+      } else if (fileType === 'document' && attachment.supabaseUrl) {
+        // For text documents, extract content
+        try {
+          const textContent = await readTextFile(attachment.supabaseUrl);
+          processedContent.push({
+            type: 'text',
+            text: `File: ${attachment.name}\n\n${textContent}`,
+          });
+        } catch (error) {
+          console.error('Error reading text file:', error);
+          processedContent.push({
+            type: 'text',
+            text: `File: ${attachment.name} (content could not be read)`,
+          });
+        }
+      } else {
+        // For other file types, just include metadata
+        processedContent.push({
+          type: 'text',
+          text: `File attached: ${attachment.name} (${attachment.type})`,
+        });
+      }
+    } catch (error) {
+      console.error('Error processing attachment:', error);
+      processedContent.push({
+        type: 'text',
+        text: `File: ${attachment.name} (processing failed)`,
+      });
+    }
+  }
+
+  return processedContent;
+}
 
 export async function POST(req: Request) {
   try {
@@ -46,13 +101,40 @@ export async function POST(req: Request) {
     // Track timing for assistant response
     const startTime = Date.now();
 
+    // Process the last message to include any attachments
+    const processedMessages = await Promise.all(
+      messages.map(async (msg, index) => {
+        const baseMessage = {
+          role: msg.role,
+          content: msg.content || '',
+          ...(msg.id && { id: msg.id }),
+        };
+
+        // Only process attachments for the latest user message
+        if (msg.role === 'user' && index === messages.length - 1 && msg.attachments?.length) {
+          const attachmentContent = await processAttachments(msg.attachments);
+          
+          if (attachmentContent.length > 0) {
+            // Create multimodal content array
+            const content = [
+              { type: 'text', text: msg.content || '' },
+              ...attachmentContent,
+            ];
+            
+            return {
+              ...baseMessage,
+              content,
+            };
+          }
+        }
+
+        return baseMessage;
+      })
+    );
+
     const result = streamText({
       model: openai('gpt-4o'),
-      messages: messages.map((msg) => ({
-        role: msg.role,
-        content: msg.content || '',
-        ...(msg.id && { id: msg.id }),
-      })),
+      messages: processedMessages,
       tools: {
         // https://ai-sdk.dev/docs/getting-started/expo#enhance-your-chatbot-with-tools
         weather: tool({

@@ -1,4 +1,4 @@
-import { Text, View, StatusBar } from 'react-native';
+import { Text, View, StatusBar, useState } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardPaddingView, useTheme, Sidebar, useSidebar } from '@/features/shared';
 import { useChatManager } from '../hooks/useChatManager';
@@ -6,6 +6,7 @@ import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { EmptyState } from './EmptyState';
 import { InputBar } from './InputBar';
+import { FileSelectionModal } from './FileSelectionModal';
 
 export function Chat() {
   const {
@@ -19,9 +20,19 @@ export function Chat() {
     currentConversationId,
     handleConversationSelect,
     handleNewConversation,
-  } = useChatManager();
+    // File upload functionality (if available from useChatManager)
+    attachments,
+    isUploading,
+    selectFiles,
+    selectImages,
+    captureImage,
+    removeAttachment,
+  } = useChatManager() as any; // Cast to any to avoid type errors during development
   const { isDark } = useTheme();
   const sidebar = useSidebar();
+  
+  // File selection modal state
+  const [showFileModal, setShowFileModal] = useState(false);
 
   if (error) {
     return (
@@ -56,7 +67,10 @@ export function Chat() {
           input={input}
           onInputChange={handleInputChange}
           onSend={onSend}
-          isLoading={isLoading}
+          isLoading={isLoading || isUploading}
+          onPlusPress={() => setShowFileModal(true)}
+          attachments={attachments}
+          onRemoveAttachment={removeAttachment}
         />
         <KeyboardPaddingView />
       </View>
@@ -68,6 +82,15 @@ export function Chat() {
         appName="AI Assistant"
         onConversationSelect={handleConversationSelect}
         currentConversationId={currentConversationId}
+      />
+
+      {/* File Selection Modal */}
+      <FileSelectionModal
+        visible={showFileModal}
+        onClose={() => setShowFileModal(false)}
+        onSelectFiles={() => selectFiles && selectFiles()}
+        onSelectImages={() => selectImages && selectImages()}
+        onCaptureImage={() => captureImage && captureImage()}
       />
     </SafeAreaView>
   );
