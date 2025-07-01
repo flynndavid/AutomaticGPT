@@ -2,6 +2,7 @@ import { TextInput, View, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/features/shared';
+import { haptics } from '@/lib/haptics';
 
 interface InputBarProps {
   input: string;
@@ -37,7 +38,13 @@ export function InputBar({
           placeholderTextColor={isDark ? '#6b7280' : '#999'}
           value={input}
           onChangeText={onInputChange}
-          onSubmitEditing={onSend}
+          onSubmitEditing={() => {
+            if (canSend) {
+              haptics.messageSent();
+              onSend();
+            }
+          }}
+          onFocus={() => haptics.textInput()}
           blurOnSubmit={false}
           multiline
           textAlignVertical="top"
@@ -45,17 +52,34 @@ export function InputBar({
 
         {/* Button row below input */}
         <View className="flex-row items-center justify-between pt-2">
-          <Pressable onPress={onPlusPress} className="w-12 h-12 items-center justify-center">
+          <Pressable 
+            onPress={() => {
+              haptics.buttonPress();
+              onPlusPress?.();
+            }} 
+            className="w-12 h-12 items-center justify-center"
+          >
             <Ionicons name="add" size={28} color={isDark ? '#9ca3af' : '#666'} />
           </Pressable>
 
           <View className="flex-row items-center gap-3">
-            <Pressable onPress={onVoicePress} className="w-12 h-12 items-center justify-center">
+            <Pressable 
+              onPress={() => {
+                haptics.buttonPress();
+                onVoicePress?.();
+              }} 
+              className="w-12 h-12 items-center justify-center"
+            >
               <Ionicons name="mic" size={24} color={isDark ? '#9ca3af' : '#666'} />
             </Pressable>
 
             <Pressable
-              onPress={onSend}
+              onPress={() => {
+                if (canSend) {
+                  haptics.messageSent();
+                  onSend();
+                }
+              }}
               disabled={!canSend}
               className={`w-12 h-12 rounded-full justify-center items-center ${
                 canSend ? 'bg-blue-500' : 'bg-gray-300'
