@@ -1,5 +1,5 @@
 import { Text, View, SafeAreaView, StatusBar } from 'react-native';
-import { KeyboardPaddingView, useTheme } from '@/features/shared';
+import { KeyboardPaddingView, useTheme, Sidebar, useSidebar } from '@/features/shared';
 import { useChatController } from '../hooks/useChatController';
 import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
@@ -10,6 +10,7 @@ export function Chat() {
   const { messages, error, input, isLoading, handleInputChange, onSend, handleSuggestionPress } =
     useChatController();
   const { isDark } = useTheme();
+  const sidebar = useSidebar();
 
   if (error) {
     return (
@@ -31,7 +32,7 @@ export function Chat() {
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={isDark ? '#0f0f11' : '#fafaf9'}
       />
-      <ChatHeader />
+      <ChatHeader onMenuPress={sidebar.open} />
 
       <View className="flex-1">
         <MessageList messages={messages} isLoading={isLoading} />
@@ -48,6 +49,15 @@ export function Chat() {
         </View>
         <KeyboardPaddingView />
       </View>
+
+      {/* Sidebar */}
+      <Sidebar
+        isOpen={sidebar.isOpen}
+        onClose={sidebar.close}
+        appName="ChatGPT"
+        userName="Jane Smith"
+        userEmail="jane.smith@example.com"
+      />
     </SafeAreaView>
   );
 }

@@ -2,12 +2,16 @@ import { Text, View, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemeToggle, useTheme } from '@/features/shared';
 
-export function ChatHeader() {
+interface ChatHeaderProps {
+  onMenuPress?: () => void;
+}
+
+export function ChatHeader({ onMenuPress }: ChatHeaderProps) {
   const { isDark } = useTheme();
 
   return (
     <View className="flex-row items-center justify-between px-4 py-3 bg-background border-b border-border">
-      <Pressable className="w-10 h-10 items-center justify-center">
+      <Pressable onPress={onMenuPress} className="w-10 h-10 items-center justify-center">
         <Ionicons name="menu" size={24} color={isDark ? '#fff' : '#000'} />
       </Pressable>
 
