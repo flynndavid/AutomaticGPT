@@ -3,7 +3,7 @@
  * Provides advanced analytics for conversations and messages
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '@/lib/supabase';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { logger } from '@/lib/logger';

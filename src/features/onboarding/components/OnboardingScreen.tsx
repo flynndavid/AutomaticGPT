@@ -9,6 +9,7 @@ import { useOnboarding } from '../hooks/useOnboarding';
 import { ROUTES, getSafeRoute } from '@/config/routes';
 import { defaultSlides } from '../data/slides';
 import { logger } from '@/lib/logger';
+import { haptics } from '@/lib/haptics';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -32,11 +33,14 @@ export function OnboardingScreen() {
   }, [hasCompletedOnboarding]);
 
   const handleSkip = async () => {
+    haptics.buttonPress();
     try {
       await completeOnboarding();
+      haptics.screenTransition();
       const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
       router.replace(safeRoute as any);
     } catch (error) {
+      haptics.error();
       logger.error('Error completing onboarding:', error);
       // Still navigate even if storage fails
       const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
@@ -45,14 +49,18 @@ export function OnboardingScreen() {
   };
 
   const handleNext = async () => {
+    haptics.buttonPress();
     if (currentIndex < defaultSlides.length - 1) {
+      haptics.selection();
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
       try {
         await completeOnboarding();
+        haptics.success();
         const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
         router.replace(safeRoute as any);
       } catch (error) {
+        haptics.error();
         logger.error('Error completing onboarding:', error);
         // Still navigate even if storage fails
         const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);

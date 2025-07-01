@@ -12,11 +12,11 @@ interface MessageBubbleProps {
   message: UIMessage;
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const { isDark } = useTheme();
 
-  const content = message.parts
+  const content = useMemo(() => message.parts
     .map((part) => {
       switch (part.type) {
         case 'text': {
@@ -70,7 +70,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           return null;
       }
     })
-    .filter(Boolean);
+    .filter(Boolean), [message.parts, isUser, isDark]);
 
   // Handle loading state
   if (message.id === 'loading') {
@@ -108,4 +108,4 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       </View>
     </Animated.View>
   );
-}
+});

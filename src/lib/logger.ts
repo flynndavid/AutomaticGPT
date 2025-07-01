@@ -58,10 +58,11 @@ export const logger = {
   /**
    * Log network requests (only in development)
    */
-  network: (method: string, url: string, status?: number) => {
+  network: (method: string, url: string, status?: number, cached?: string) => {
     if (isDevelopment) {
       const statusColor = status && status >= 400 ? '🔴' : '🟢';
-      console.log(`${statusColor} Network: ${method} ${url}${status ? ` - ${status}` : ''}`);
+      const cachePrefix = cached ? `💾 ${cached} ` : '';
+      console.log(`${cachePrefix}${statusColor} Network: ${method} ${url}${status ? ` - ${status}` : ''}`);
     }
   },
 

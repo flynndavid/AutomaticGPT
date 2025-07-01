@@ -1,9 +1,9 @@
 import { useChat } from '@ai-sdk/react';
 import { useEffect, useState } from 'react';
-import * as Haptics from 'expo-haptics';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useConversation } from './useConversation';
 import { logger } from '@/lib/logger';
+import { haptics } from '@/lib/haptics';
 
 interface UseChatControllerProps {
   conversationId: string | null;
@@ -79,7 +79,7 @@ export function useChatController(
       return;
     }
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.messageSent();
     handleSubmit();
   };
 
