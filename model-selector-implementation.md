@@ -12,7 +12,7 @@ I've successfully implemented a dynamic model selection feature for the chat app
 
 **Supported Models:**
 - **OpenAI**: GPT-4o, GPT-4o Mini, GPT-4 Turbo, GPT-3.5 Turbo
-- **Anthropic**: Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Opus
+- **Anthropic**: Claude 4 Sonnet, Claude 3.5
 
 ### 2. Model Selection Hook (`src/features/chat/hooks/useModelSelection.ts`)
 - Manages model selection state with AsyncStorage persistence
