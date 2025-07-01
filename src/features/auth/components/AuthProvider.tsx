@@ -108,14 +108,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             } = supabase.auth.onAuthStateChange(async (event, session) => {
               console.log(`[AUTH] Auth state change: ${event}`);
 
-              // Update auth state immediately
+              // Update auth state, but preserve profile if we already have one
               if (mountedRef.current) {
                 setState((prev) => ({
                   ...prev,
                   isAuthenticated: !!session,
                   user: session?.user || null,
                   session,
-                  profile: null, // Start with null, will be loaded async
+                  profile: session?.user?.id === prev.user?.id ? prev.profile : null, // Keep profile if same user
                   isLoading: false,
                   error: null,
                 }));
@@ -126,25 +126,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 }
               }
 
-              // Load profile in background (non-blocking)
+              // Load profile in background (non-blocking) if we don't already have it
               if (session?.user && mountedRef.current) {
-                loadProfile(session.user.id)
-                  .then((profile) => {
-                    if (mountedRef.current) {
-                      setState((prev) => ({
-                        ...prev,
-                        profile,
-                      }));
-                    }
-                  })
-                  .catch((error) => {
-                    console.warn('[AUTH] Background profile loading failed:', error);
-                  });
+                setState((prevState) => {
+                  // Only load profile if we don't have one for this user
+                  if (!prevState.profile || prevState.profile.id !== session.user.id) {
+                    loadProfile(session.user.id)
+                      .then((profile) => {
+                        if (mountedRef.current) {
+                          setState((prev) => ({
+                            ...prev,
+                            profile,
+                          }));
+                        }
+                      })
+                      .catch((error) => {
+                        console.warn('[AUTH] Background profile loading failed:', error);
+                      });
+                  }
+                  return prevState;
+                });
               }
             });
 
             subscription = authSubscription;
             console.log('[AUTH] Auth listener initialized successfully');
+
+            // Fallback: If no INITIAL_SESSION event fires within 2 seconds, bootstrap anyway
+            setTimeout(() => {
+              if (mounted && !bootstrapped) {
+                console.warn('[AUTH] Bootstrap timeout - forcing initialization complete');
+                setBootstrapped(true);
+                setState((prev) => ({ ...prev, isLoading: false }));
+              }
+            }, 2000);
           } catch (listenerError) {
             console.error('[AUTH] Failed to set up auth listener:', listenerError);
             // Fallback: disable auth instead of blocking the app
@@ -192,16 +207,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [loadProfile, bootstrapped]);
 
-  // Authentication actions - simplified without complex loading state management
+  // Authentication actions - with optimistic updates
   const signIn = async (email: string, password: string): Promise<void> => {
     try {
       setState((prev) => ({ ...prev, error: null }));
 
-      const { error } = await auth.signIn(email, password);
+      const { data, error } = await auth.signIn(email, password);
       if (error) throw error;
 
-      // Don't manage loading state - auth listener will update UI
-      console.log('[AUTH] Sign in request sent, waiting for auth state change...');
+      // Optimistically update auth state immediately
+      if (data?.session && data?.user) {
+        console.log('[AUTH] Sign in successful, updating state optimistically');
+        setState((prev) => ({
+          ...prev,
+          isAuthenticated: true,
+          user: data.user,
+          session: data.session,
+          profile: null, // Will be loaded by listener or on next render
+          isLoading: false,
+        }));
+
+        // Load profile in background
+        if (data.user.id) {
+          loadProfile(data.user.id)
+            .then((profile) => {
+              if (mountedRef.current) {
+                setState((prev) => ({ ...prev, profile }));
+              }
+            })
+            .catch((error) => {
+              console.warn('[AUTH] Profile loading failed after sign in:', error);
+            });
+        }
+      } else {
+        console.log('[AUTH] Sign in request sent, waiting for auth state change...');
+      }
     } catch (error) {
       setState((prev) => ({
         ...prev,
@@ -286,8 +326,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { error } = await auth.signOut();
       if (error) throw error;
 
-      // Don't manage loading state - auth listener will update UI
-      console.log('[AUTH] Sign out request sent, waiting for auth state change...');
+      // Optimistically clear auth state immediately
+      console.log('[AUTH] Sign out successful, clearing state optimistically');
+      setState((prev) => ({
+        ...prev,
+        isAuthenticated: false,
+        user: null,
+        session: null,
+        profile: null,
+        isLoading: false,
+      }));
     } catch (error) {
       setState((prev) => ({
         ...prev,
