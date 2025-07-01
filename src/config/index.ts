@@ -74,6 +74,16 @@ export const config = {
     ),
   },
 
+  // File Upload Configuration
+  fileUpload: {
+    maxFileSize: getNumberEnvVar('EXPO_PUBLIC_MAX_FILE_SIZE', 10485760), // 10MB default
+    maxImageSize: getNumberEnvVar('EXPO_PUBLIC_MAX_IMAGE_SIZE', 1024), // Max width/height for AI processing
+    supportedImageTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+    supportedDocumentTypes: ['application/pdf', 'text/plain', 'text/csv'],
+    storageBucket: getEnvVar('EXPO_PUBLIC_SUPABASE_STORAGE_BUCKET', 'chat-files'),
+    thumbnailSize: getNumberEnvVar('EXPO_PUBLIC_THUMBNAIL_SIZE', 150),
+  },
+
   // Feature Flags (imported from features.ts)
   features: FEATURES,
 

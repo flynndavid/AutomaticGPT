@@ -19,6 +19,12 @@ This document provides an overview of all features implemented in the Expo templ
 ### 💬 AI Chat Interface
 
 - **Streaming Chat** - Real-time AI conversations using OpenAI GPT-4o
+- **File Uploads** - Image and document attachments with multimodal AI processing
+  - Image uploads with GPT-4o vision analysis
+  - Document uploads (PDF, TXT, CSV) with text extraction
+  - Automatic file validation and optimization
+  - Real-time upload progress and error handling
+  - Secure file storage with Supabase
 - **Message History** - Persistent chat history with virtualized scrolling
 - **Voice Input** - Speech-to-text input (configurable)
 - **Tool Support** - AI can use tools and display structured responses
@@ -79,7 +85,6 @@ This document provides an overview of all features implemented in the Expo templ
 ### 🗄️ Data Management
 
 - **Offline Support** - Local data caching and sync
-- **File Uploads** - Profile images and document handling
 - **Data Export** - User data portability
 
 ### 🔔 Notifications

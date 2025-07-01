@@ -45,8 +45,8 @@ export const TEMPLATE_FEATURES = {
   enableAppleAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_APPLE_AUTH', false),
 
   // Storage & File Management
-  enableStorage: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_STORAGE', false),
-  enableFileUploads: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_FILE_UPLOADS', false),
+  enableStorage: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_STORAGE', true),
+  enableFileUploads: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_FILE_UPLOADS', true),
 
   // Navigation & Layout
   enableOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_ONBOARDING', true),

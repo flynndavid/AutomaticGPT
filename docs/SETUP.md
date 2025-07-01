@@ -141,6 +141,43 @@ If you're using the authentication feature (`EXPO_PUBLIC_ENABLE_AUTH=true`), you
 
 For detailed authentication implementation, see the [Auth & Onboarding Implementation Guide](../roadmap/pending/auth_onboarding_implementation_guide.md).
 
+#### Setting up File Uploads
+
+If you're using the file upload feature (`EXPO_PUBLIC_ENABLE_FILE_UPLOADS=true`), follow these additional steps:
+
+1. **Install Required Dependencies**:
+   ```bash
+   npm install expo-document-picker expo-image-picker expo-image-manipulator expo-file-system
+   ```
+
+2. **Configure Environment Variables**:
+   ```bash
+   # Enable file upload features in your .env
+   EXPO_PUBLIC_ENABLE_STORAGE=true
+   EXPO_PUBLIC_ENABLE_FILE_UPLOADS=true
+   EXPO_PUBLIC_MAX_FILE_SIZE=10485760  # 10MB
+   ```
+
+3. **Run File Upload Migration**:
+   ```sql
+   -- In Supabase SQL Editor, run the migration from:
+   -- supabase/migrations/002_create_file_attachments.sql
+   ```
+
+4. **Create Storage Bucket** (in Supabase Dashboard):
+   - Go to Storage → Create bucket
+   - Name: `chat-files`
+   - Set as Public bucket
+   - Configure storage policies (see migration file)
+
+5. **Test File Upload**:
+   - Open chat screen
+   - Tap the plus (+) button
+   - Verify file selection modal appears
+   - Try uploading a small image
+
+For complete file upload setup, see the [File Upload Setup Guide](features/file-uploads/SETUP.md).
+
 ## 📱 Platform-Specific Setup
 
 ### iOS Development
@@ -181,7 +218,8 @@ Look for configuration validation messages in the terminal.
 
 - 🌓 **Dark Mode**: Toggle theme in the app
 - 🤖 **AI Chat**: Send a message (requires OpenAI key)
-- 🔐 **Authentication**: Create account and login (requires Supabase)
+- � **File Upload**: Attach images/documents to chat (requires Supabase storage)
+- �🔐 **Authentication**: Create account and login (requires Supabase)
 - 📱 **Platform**: Test on iOS, Android, and Web
 
 ### 3. Verify Environment

@@ -41,8 +41,14 @@ EXPO_PUBLIC_ENABLE_APPLE_AUTH=false
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url_here
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 
+# File Upload Features (now implemented)
+EXPO_PUBLIC_ENABLE_STORAGE=true
+EXPO_PUBLIC_ENABLE_FILE_UPLOADS=true
+EXPO_PUBLIC_MAX_FILE_SIZE=10485760  # 10MB in bytes
+EXPO_PUBLIC_MAX_IMAGE_SIZE=1024     # Max width/height for AI processing
+EXPO_PUBLIC_THUMBNAIL_SIZE=150      # Thumbnail size in pixels
+
 # Future Features (not yet implemented)
-EXPO_PUBLIC_ENABLE_STORAGE=false
 EXPO_PUBLIC_ENABLE_ANALYTICS=false
 EXPO_PUBLIC_ENABLE_PUSH_NOTIFICATIONS=false
 EXPO_PUBLIC_ENABLE_OFFLINE_MODE=false
@@ -67,6 +73,15 @@ These control which features are enabled in your app:
 
 - `EXPO_PUBLIC_ENABLE_CHAT`: Enable/disable chat functionality
 - `EXPO_PUBLIC_ENABLE_VOICE_INPUT`: Enable/disable voice input (not yet implemented)
+
+### File Upload Configuration
+
+- `EXPO_PUBLIC_ENABLE_STORAGE`: Enable/disable Supabase storage integration
+- `EXPO_PUBLIC_ENABLE_FILE_UPLOADS`: Enable/disable file upload functionality in chat
+- `EXPO_PUBLIC_MAX_FILE_SIZE`: Maximum file size in bytes (default: 10MB)
+- `EXPO_PUBLIC_MAX_IMAGE_SIZE`: Maximum image dimensions for AI processing (default: 1024px)
+- `EXPO_PUBLIC_THUMBNAIL_SIZE`: Size of generated thumbnails (default: 150px)
+- `EXPO_PUBLIC_SUPABASE_STORAGE_BUCKET`: Name of the Supabase storage bucket (default: chat-files)
 - `EXPO_PUBLIC_ENABLE_THEME_TOGGLE`: Enable/disable dark mode toggle
 - `EXPO_PUBLIC_ENABLE_AUTH`: Enable/disable authentication system
 - `EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING`: Enable/disable splash screen and onboarding flow
