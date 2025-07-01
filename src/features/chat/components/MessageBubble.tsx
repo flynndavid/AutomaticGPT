@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import React, { Fragment, memo, useMemo } from 'react';
 import { Text, View, ActivityIndicator } from 'react-native';
 import Animated, { Layout, Easing, FadeIn } from 'react-native-reanimated';
 import Markdown from 'react-native-markdown-display';

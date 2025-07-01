@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { FlatList, type ListRenderItem, View } from 'react-native';
 import { UIMessage } from 'ai';
 import { MessageBubble } from './MessageBubble';

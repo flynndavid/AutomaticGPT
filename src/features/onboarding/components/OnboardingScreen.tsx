@@ -8,6 +8,7 @@ import { useTheme } from '@/features/shared';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { ROUTES, getSafeRoute } from '@/config/routes';
 import { defaultSlides } from '../data/slides';
+import { logger } from '@/lib/logger';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -36,7 +37,7 @@ export function OnboardingScreen() {
       const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
       router.replace(safeRoute as any);
     } catch (error) {
-      console.error('Error completing onboarding:', error);
+      logger.error('Error completing onboarding:', error);
       // Still navigate even if storage fails
       const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
       router.replace(safeRoute as any);
@@ -52,7 +53,7 @@ export function OnboardingScreen() {
         const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
         router.replace(safeRoute as any);
       } catch (error) {
-        console.error('Error completing onboarding:', error);
+        logger.error('Error completing onboarding:', error);
         // Still navigate even if storage fails
         const safeRoute = getSafeRoute(ROUTES.AUTH.LOGIN);
         router.replace(safeRoute as any);
