@@ -38,12 +38,19 @@ export const TEMPLATE_FEATURES = {
   enableSocialAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SOCIAL_AUTH', false),
   enableProfile: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_PROFILE', false),
 
+  // Auth Methods (individual control)
+  enableEmailAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_EMAIL_AUTH', true),
+  enableSmsAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SMS_AUTH', false),
+  enableGoogleAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_GOOGLE_AUTH', false),
+  enableAppleAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_APPLE_AUTH', false),
+
   // Storage & File Management
   enableStorage: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_STORAGE', false),
   enableFileUploads: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_FILE_UPLOADS', false),
 
   // Navigation & Layout
   enableOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_ONBOARDING', false),
+  enableSplashOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING', false),
   enableSidebar: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SIDEBAR', false),
   enableTabNavigation: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_TAB_NAVIGATION', true),
 
@@ -66,9 +73,22 @@ export const FEATURES = {
  */
 export const FEATURE_CATEGORIES = {
   ui: ['enableVoiceInput', 'enableDarkMode', 'enableHapticFeedback', 'enableAnimations'] as const,
-  auth: ['enableAuth', 'enableSocialAuth', 'enableProfile'] as const,
+  auth: [
+    'enableAuth',
+    'enableSocialAuth',
+    'enableProfile',
+    'enableEmailAuth',
+    'enableSmsAuth',
+    'enableGoogleAuth',
+    'enableAppleAuth',
+  ] as const,
   storage: ['enableStorage', 'enableFileUploads'] as const,
-  navigation: ['enableOnboarding', 'enableSidebar', 'enableTabNavigation'] as const,
+  navigation: [
+    'enableOnboarding',
+    'enableSplashOnboarding',
+    'enableSidebar',
+    'enableTabNavigation',
+  ] as const,
   advanced: [
     'enableOfflineMode',
     'enableAnalytics',

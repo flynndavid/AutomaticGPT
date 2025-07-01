@@ -10,30 +10,33 @@ The template is designed to be **modular and configurable**. You can enable or d
 
 ### ✅ Currently Implemented
 
-| Feature                | Description                         | Environment Variable            | Status   |
-| ---------------------- | ----------------------------------- | ------------------------------- | -------- |
-| 🤖 **AI Chat**         | OpenAI-powered chat interface       | `OPENAI_API_KEY`                | ✅ Ready |
-| 🌓 **Dark Mode**       | Light/dark theme switching          | `EXPO_PUBLIC_ENABLE_DARK_MODE`  | ✅ Ready |
-| 📱 **Responsive UI**   | NativeWind (Tailwind) styling       | Built-in                        | ✅ Ready |
-| 🔄 **Hot Reload**      | Fast development experience         | Built-in                        | ✅ Ready |
-| ⚡ **Haptic Feedback** | Touch feedback on interactions      | `EXPO_PUBLIC_ENABLE_HAPTICS`    | ✅ Ready |
-| 🎭 **Animations**      | Smooth UI transitions               | `EXPO_PUBLIC_ENABLE_ANIMATIONS` | ✅ Ready |
-| 🧪 **Testing**         | Jest + React Native Testing Library | Built-in                        | ✅ Ready |
-| 📦 **TypeScript**      | 100% type coverage                  | Built-in                        | ✅ Ready |
-| 🔍 **Code Quality**    | ESLint + Prettier + Husky           | Built-in                        | ✅ Ready |
+| Feature                | Description                         | Environment Variable                   | Status   |
+| ---------------------- | ----------------------------------- | -------------------------------------- | -------- |
+| 🤖 **AI Chat**         | OpenAI-powered chat interface       | `OPENAI_API_KEY`                       | ✅ Ready |
+| 🔐 **Authentication**  | Supabase auth with email/password   | `EXPO_PUBLIC_ENABLE_AUTH`              | ✅ Ready |
+| 🎓 **Onboarding**      | Welcome screens and user flow       | `EXPO_PUBLIC_ENABLE_ONBOARDING`        | ✅ Ready |
+| 🌅 **Splash Screen**   | App startup and branding screen     | `EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING` | ✅ Ready |
+| 🌓 **Dark Mode**       | Light/dark theme switching          | `EXPO_PUBLIC_ENABLE_DARK_MODE`         | ✅ Ready |
+| 📱 **Responsive UI**   | NativeWind (Tailwind) styling       | Built-in                               | ✅ Ready |
+| 🔄 **Hot Reload**      | Fast development experience         | Built-in                               | ✅ Ready |
+| ⚡ **Haptic Feedback** | Touch feedback on interactions      | `EXPO_PUBLIC_ENABLE_HAPTICS`           | ✅ Ready |
+| 🎭 **Animations**      | Smooth UI transitions               | `EXPO_PUBLIC_ENABLE_ANIMATIONS`        | ✅ Ready |
+| 🧪 **Testing**         | Jest + React Native Testing Library | Built-in                               | ✅ Ready |
+| 📦 **TypeScript**      | 100% type coverage                  | Built-in                               | ✅ Ready |
+| 🔍 **Code Quality**    | ESLint + Prettier + Husky           | Built-in                               | ✅ Ready |
 
 ### 🚧 Planned Features (Future Phases)
 
-| Feature                   | Description                | Environment Variable            | Status     |
-| ------------------------- | -------------------------- | ------------------------------- | ---------- |
-| 🔐 **Authentication**     | Login/signup with Supabase | `EXPO_PUBLIC_ENABLE_AUTH`       | 📋 Planned |
-| 👤 **User Profiles**      | Profile management         | `EXPO_PUBLIC_ENABLE_PROFILE`    | 📋 Planned |
-| 📁 **File Storage**       | Upload/manage files        | `EXPO_PUBLIC_ENABLE_STORAGE`    | 📋 Planned |
-| 🎓 **Onboarding**         | User onboarding flow       | `EXPO_PUBLIC_ENABLE_ONBOARDING` | 📋 Planned |
-| 🔀 **Sidebar Navigation** | Drawer navigation          | `EXPO_PUBLIC_ENABLE_SIDEBAR`    | 📋 Planned |
-| 📊 **Analytics**          | Usage tracking             | `EXPO_PUBLIC_ENABLE_ANALYTICS`  | 📋 Planned |
-| 🔔 **Push Notifications** | Mobile notifications       | `EXPO_PUBLIC_ENABLE_PUSH`       | 📋 Planned |
-| 🌐 **Realtime Features**  | Live data updates          | `EXPO_PUBLIC_ENABLE_REALTIME`   | 📋 Planned |
+| Feature                   | Description          | Environment Variable             | Status     |
+| ------------------------- | -------------------- | -------------------------------- | ---------- |
+| **User Profiles**         | Profile management   | `EXPO_PUBLIC_ENABLE_PROFILE`     | 📋 Planned |
+| 📁 **File Storage**       | Upload/manage files  | `EXPO_PUBLIC_ENABLE_STORAGE`     | 📋 Planned |
+| 🔀 **Sidebar Navigation** | Drawer navigation    | `EXPO_PUBLIC_ENABLE_SIDEBAR`     | 📋 Planned |
+| � **SMS Authentication**  | Phone number sign in | `EXPO_PUBLIC_ENABLE_SMS_AUTH`    | 📋 Planned |
+| 🔍 **OAuth Providers**    | Google/Apple sign in | `EXPO_PUBLIC_ENABLE_GOOGLE_AUTH` | 📋 Planned |
+| 📊 **Analytics**          | Usage tracking       | `EXPO_PUBLIC_ENABLE_ANALYTICS`   | 📋 Planned |
+| 🔔 **Push Notifications** | Mobile notifications | `EXPO_PUBLIC_ENABLE_PUSH`        | 📋 Planned |
+| 🌐 **Realtime Features**  | Live data updates    | `EXPO_PUBLIC_ENABLE_REALTIME`    | 📋 Planned |
 
 ## 🔧 Core Features
 
@@ -65,6 +68,66 @@ EXPO_PUBLIC_STREAMING_ENABLED=true
 
 **Usage:**
 The chat interface is automatically available on the home screen. Users can start chatting immediately after providing an OpenAI API key.
+
+### 🔐 Authentication System
+
+**What it does:** Complete authentication system with Supabase backend.
+
+**Configuration:**
+
+```bash
+# Enable authentication
+EXPO_PUBLIC_ENABLE_AUTH=true
+
+# Supabase connection (required)
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Auth methods
+EXPO_PUBLIC_ENABLE_EMAIL_AUTH=true
+EXPO_PUBLIC_ENABLE_SMS_AUTH=false
+EXPO_PUBLIC_ENABLE_GOOGLE_AUTH=false
+EXPO_PUBLIC_ENABLE_APPLE_AUTH=false
+```
+
+**Features:**
+
+- ✅ Email/password authentication
+- ✅ User registration and login
+- ✅ Session management and persistence
+- ✅ Protected routes
+- ✅ Auto-redirect based on auth state
+- ✅ Form validation and error handling
+- ✅ User profile creation
+
+**Usage:**
+When enabled, users must authenticate before accessing the main app. The system automatically handles routing between auth and app screens.
+
+### 🎓 Onboarding Flow
+
+**What it does:** Guided introduction for new users with feature highlights.
+
+**Configuration:**
+
+```bash
+# Enable onboarding
+EXPO_PUBLIC_ENABLE_ONBOARDING=true
+
+# Enable splash screen
+EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING=true
+```
+
+**Features:**
+
+- ✅ Custom splash screen with app branding
+- ✅ 3-slide onboarding carousel
+- ✅ Skippable introduction
+- ✅ Smooth page transitions
+- ✅ Progress indicators
+- ✅ Customizable slide content
+
+**Usage:**
+New users see a splash screen followed by onboarding slides explaining key features. Users can skip onboarding at any time.
 
 ### 🌓 Dark Mode Support
 
