@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useConversation } from './useConversation';
+import { useModelSelection } from './useModelSelection';
 
 interface UseChatControllerProps {
   conversationId: string | null;
@@ -14,6 +15,7 @@ export function useChatController(
 ) {
   const { user } = useAuth();
   const { messages: dbMessages, loading: conversationLoading } = useConversation(conversationId);
+  const { selectedModel } = useModelSelection();
   const [isInitialized, setIsInitialized] = useState(false);
 
   const {
@@ -30,6 +32,7 @@ export function useChatController(
       conversationId: conversationId || undefined,
       userId: user?.id || undefined,
       saveMessages: true,
+      model: selectedModel?.id,
     },
     onFinish: (message) => {
       // Conversation should be created by now if needed
