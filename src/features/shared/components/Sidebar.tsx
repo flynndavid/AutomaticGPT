@@ -31,7 +31,6 @@ interface SidebarProps {
 // Navigation items
 const navigationItems = [
   { id: 'chat', label: 'New Chat', icon: 'add-outline' },
-  { id: 'analytics', label: 'Analytics', icon: 'analytics-outline' },
   { id: 'documents', label: 'Documents', icon: 'document-text-outline' },
   { id: 'memories', label: 'Memories', icon: 'library-outline' },
   { id: 'connections', label: 'Connections', icon: 'people-outline' },
@@ -39,6 +38,7 @@ const navigationItems = [
 
 const profileMenuItems = [
   { id: 'profile', label: 'Profile', icon: 'person-outline' },
+  { id: 'analytics', label: 'Analytics', icon: 'analytics-outline' },
   { id: 'billing', label: 'Billing', icon: 'card-outline' },
   { id: 'theme', label: 'Theme', icon: 'contrast-outline' },
   { id: 'share', label: 'Share App', icon: 'share-outline' },
@@ -128,8 +128,6 @@ export function Sidebar({
       } finally {
         setIsCreatingConversation(false);
       }
-    } else if (itemId === 'analytics') {
-      setShowAnalyticsDashboard(true);
     } else {
       console.log(`Navigate to: ${itemId}`);
       // TODO: Implement navigation for other items
@@ -220,6 +218,8 @@ export function Sidebar({
 
     if (itemId === 'theme') {
       toggleTheme();
+    } else if (itemId === 'analytics') {
+      setShowAnalyticsDashboard(true);
     } else if (itemId === 'logout' && FEATURES.enableAuth) {
       handleSignOut();
       return;
@@ -274,7 +274,7 @@ export function Sidebar({
           {/* Navigation Section */}
           <View className="py-4">
             <Text className="text-sm font-semibold text-muted-foreground px-6 mb-3 uppercase tracking-wider">
-              Navigation
+              Pages
             </Text>
             {navigationItems.map((item) => (
               <Pressable
@@ -295,7 +295,7 @@ export function Sidebar({
           {/* Chat History Section */}
           <View className="py-4 flex-1">
             <Text className="text-sm font-semibold text-muted-foreground px-6 mb-3 uppercase tracking-wider">
-              Conversations
+              Chat History
             </Text>
 
             {loading ? (

@@ -63,7 +63,7 @@ project/
 │   │   └── task-2.md
 │   ├── docs/              # Documentation directory
 │   │   ├── prd.txt        # Product requirements
-│   ├── reports/           # Analysis reports directory
+├── reports/           # Analysis reports directory
 │   │   └── task-complexity-report.json
 │   ├── templates/         # Template files
 │   │   └── example_prd.txt  # Example PRD template
@@ -414,4 +414,102 @@ These commands make AI calls and may take up to a minute:
 
 ---
 
+## Auth State Management - Critical Patterns ⚠️
+
+### Expo + Supabase Auth Implementation
+
+**ALWAYS use optimistic updates for auth actions to avoid UI delays:**
+
+```tsx
+const signIn = async (email: string, password: string): Promise<void> => {
+  try {
+    setState((prev) => ({ ...prev, error: null }));
+
+    const { data, error } = await auth.signIn(email, password);
+    if (error) throw error;
+
+    // 🔥 CRITICAL: Optimistically update auth state immediately
+    if (data?.session && data?.user) {
+      console.log('[AUTH] Sign in successful, updating state optimistically');
+      setState((prev) => ({
+        ...prev,
+        isAuthenticated: true,
+        user: data.user,
+        session: data.session,
+        profile: null, // Will be loaded by listener or on next render
+        isLoading: false,
+      }));
+
+      // Load profile in background
+      if (data.user.id) {
+        loadProfile(data.user.id).then((profile) => {
+          if (mountedRef.current) {
+            setState((prev) => ({ ...prev, profile }));
+          }
+        });
+      }
+    }
+  } catch (error) {
+    // Handle errors...
+  }
+};
+```
+
+**Key Auth Patterns:**
+
+1. **Never wait for `onAuthStateChange` events** - they can be unreliable
+2. **Use optimistic updates** after successful API calls for immediate UI response
+3. **Preserve user profile** across auth state changes when same user
+4. **Add bootstrap timeout fallback** (2s) for `INITIAL_SESSION` event
+5. **Use ref-based initialization guard** to prevent double mounting
+6. **Implement AppState-aware auto-refresh** in `supabase.ts`:
+
+```tsx
+// In supabase.ts
+AppState.addEventListener('change', (state) => {
+  if (state === 'active') {
+    supabase.auth.startAutoRefresh();
+  } else {
+    supabase.auth.stopAutoRefresh();
+  }
+});
+```
+
+**Navigation Pattern:**
+
+```tsx
+// src/app/index.tsx - Use declarative redirects
+export default function IndexScreen() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <View>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  if (!FEATURES.enableAuth) {
+    return <Redirect href="/(app)" />;
+  }
+
+  return isAuthenticated ? <Redirect href="/(app)" /> : <Redirect href="/(auth)/welcome" />;
+}
+```
+
+**Why This Matters:**
+
+- Eliminates white screen issues during auth transitions
+- Provides immediate UI feedback (no waiting for events)
+- Maintains reliable session management
+- Works with React Strict Mode and fast refresh
+
 _This guide ensures Claude Code has immediate access to Task Master's essential functionality for agentic development workflows._
+
+# important-instruction-reminders
+
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly requested by the User.
