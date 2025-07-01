@@ -43,24 +43,40 @@ export const AVAILABLE_MODELS: ModelConfig[] = [
   },
   // Anthropic Models
   {
-    id: 'claude-4-sonnet',
-    name: 'Claude 4 Sonnet',
+    id: 'claude-sonnet-4-20250514',
+    name: 'Claude Sonnet 4',
     provider: 'anthropic',
-    description: 'Latest and most capable Claude model',
+    description: 'High-performance model with exceptional reasoning capabilities',
     maxTokens: 200000,
     supportsTools: true,
   },
   {
-    id: 'claude-3.5',
-    name: 'Claude 3.5',
+    id: 'claude-opus-4-20250514',
+    name: 'Claude Opus 4',
     provider: 'anthropic',
-    description: 'Powerful and efficient Claude model',
+    description: 'Most powerful and capable Claude model',
+    maxTokens: 200000,
+    supportsTools: true,
+  },
+  {
+    id: 'claude-3-5-sonnet-20241022',
+    name: 'Claude 3.5 Sonnet',
+    provider: 'anthropic',
+    description: 'Previous generation intelligent model with high capability',
+    maxTokens: 200000,
+    supportsTools: true,
+  },
+  {
+    id: 'claude-3-5-haiku-20241022',
+    name: 'Claude 3.5 Haiku',
+    provider: 'anthropic',
+    description: 'Fast and efficient Claude model',
     maxTokens: 200000,
     supportsTools: true,
   },
 ];
 
-export const DEFAULT_MODEL_ID = 'gpt-4o';
+export const DEFAULT_MODEL_ID = 'claude-sonnet-4-20250514';
 
 export const getModelById = (id: string): ModelConfig | undefined => {
   for (const model of AVAILABLE_MODELS) {
