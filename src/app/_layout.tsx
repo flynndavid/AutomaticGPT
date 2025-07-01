@@ -3,6 +3,7 @@ import '@/utils/fetch-polyfill';
 
 import { Stack } from 'expo-router';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { ThemeProvider } from '@/features/shared';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -18,13 +19,15 @@ const DEFAULT_STACK_HEADER: NativeStackNavigationOptions =
 
 export default function Layout() {
   return (
-    <Stack screenOptions={DEFAULT_STACK_HEADER}>
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack>
+    <ThemeProvider>
+      <Stack screenOptions={DEFAULT_STACK_HEADER}>
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack>
+    </ThemeProvider>
   );
 }

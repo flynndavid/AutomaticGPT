@@ -1,5 +1,5 @@
-import { Chat } from '@/components/chat';
+import { Chat } from '@/features/chat';
 
-export default function Page() {
+export default function Index() {
   return <Chat />;
 }

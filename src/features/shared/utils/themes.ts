@@ -1,0 +1,36 @@
+import { vars } from 'nativewind';
+
+export const themes = {
+  light: vars({
+    '--background': '255 255 255',
+    '--foreground': '0 0 0',
+    '--card': '255 255 255',
+    '--card-foreground': '0 0 0',
+    '--primary': '59 130 246',
+    '--primary-foreground': '255 255 255',
+    '--secondary': '243 244 246',
+    '--secondary-foreground': '31 41 55',
+    '--muted': '249 250 251',
+    '--muted-foreground': '107 114 128',
+    '--border': '229 231 235',
+    '--input': '243 244 246',
+    '--accent': '243 244 246',
+    '--accent-foreground': '31 41 55',
+  }),
+  dark: vars({
+    '--background': '0 0 0',
+    '--foreground': '255 255 255',
+    '--card': '26 26 26',
+    '--card-foreground': '255 255 255',
+    '--primary': '59 130 246',
+    '--primary-foreground': '255 255 255',
+    '--secondary': '26 26 26',
+    '--secondary-foreground': '209 213 219',
+    '--muted': '26 26 26',
+    '--muted-foreground': '156 163 175',
+    '--border': '55 65 81',
+    '--input': '26 26 26',
+    '--accent': '26 26 26',
+    '--accent-foreground': '209 213 219',
+  }),
+};

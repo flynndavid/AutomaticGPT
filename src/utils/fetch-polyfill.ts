@@ -18,8 +18,8 @@ import { TextEncoderStream, TextDecoderStream } from '@stardazed/streams-text-en
 
 interface ExpoExtraRouterConfig {
   router?: {
-    origin?: any;
-    generatedOrigin?: any;
+    origin?: string | URL | boolean;
+    generatedOrigin?: string | URL | boolean;
   };
 }
 
@@ -38,7 +38,7 @@ const manifest = Constants.expoConfig;
 
 const polyfillSymbol = Symbol.for('expo.polyfillFetchWithWindowLocation');
 
-export function wrapFetchWithWindowLocation(fetch: Function & { [polyfillSymbol]?: boolean }) {
+export function wrapFetchWithWindowLocation(fetch: any) {
   if (fetch[polyfillSymbol]) {
     return fetch;
   }

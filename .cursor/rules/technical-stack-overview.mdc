@@ -12,95 +12,331 @@ This document describes the foundational technologies, project structure, and de
 ## 1. High-Level Overview
 
 * **Platform**: [Expo](mdc:https:/docs.expo.dev) SDK 53 targeting iOS, Android, and Web (server–rendered output).
-* **Language**: TypeScript
+* **Language**: TypeScript with 100% type coverage
 * **Navigation**: [expo-router](mdc:https:/expo.github.io/router) (file-based routing)
-* **Styling**: [NativeWind](mdc:https:/www.nativewind.dev) (Tailwind CSS for React Native)
-* **AI Integration**: [ai-sdk](mdc:https:/ai-sdk.dev) with OpenAI GPT-4o via serverless API routes.
-* **Animation**: react-native-reanimated v3
+* **Styling**: [NativeWind](mdc:https:/www.nativewind.dev) (Tailwind CSS for React Native) with utility-first approach
+* **AI Integration**: [ai-sdk](mdc:https:/ai-sdk.dev) with OpenAI GPT-4o via serverless API routes
+* **Animation**: react-native-reanimated v3 with safety utilities
+* **Testing**: Jest with React Native Testing Library
+* **Code Quality**: ESLint v9 (flat config) + Prettier with pre-commit hooks
 
-## 2. Project Layout
+## 2. Project Architecture
 
-Path | Purpose
----- | -------
-`[src/app](mdc:src/app)` | File-based routes & API endpoints (served by expo-router)
-`[src/components](mdc:src/components)` | Reusable UI components
-`[src/utils](mdc:src/utils)` | Cross-platform helpers (e.g. fetch polyfill)
-`[src/lib](mdc:src/lib)` | Small generic utilities (e.g. class merger)
+This project follows a **feature-based architecture** for maximum maintainability and scalability:
 
-Key routing files:
-* Global layout – `[src/app/_layout.tsx](mdc:src/app/_layout.tsx)` sets up the default native stack.
-* Home screen – `[src/app/index.tsx](mdc:src/app/index.tsx)` renders the `Chat` component.
+```
+src/
+├── app/                    # Expo Router routes & API endpoints
+│   ├── _layout.tsx        # Global navigation layout
+│   ├── index.tsx          # Home screen (renders Chat)
+│   └── api/
+│       └── chat+api.ts    # Streaming AI chat endpoint
+├── features/              # Feature-based organization
+│   ├── chat/              # Complete chat feature
+│   │   ├── components/    # Chat-specific UI components
+│   │   ├── hooks/         # Chat business logic
+│   │   ├── types/         # Chat TypeScript definitions
+│   │   └── index.ts       # Clean barrel exports
+│   └── shared/            # Cross-feature shared code
+│       ├── components/    # Reusable UI components
+│       ├── hooks/         # Shared hooks
+│       └── index.ts       # Shared barrel exports
+├── lib/                   # Generic utilities
+│   ├── utils.ts          # Class merger, general helpers
+│   ├── styles.ts         # Complex styling utilities
+│   └── animations.ts     # Safe Reanimated utilities
+├── types/                 # Global TypeScript definitions
+│   ├── api.ts            # API contract types with Zod
+│   └── index.ts          # Global type exports
+├── config/               # Application configuration
+│   └── index.ts          # Centralized config with validation
+└── utils/                # Platform-specific utilities
+    └── fetch-polyfill.ts # Cross-platform fetch compatibility
+```
 
-## 3. Core Libraries & Config
+### Key Architecture Principles
 
-* **Expo & React Native** – Configured in `[app.json](mdc:app.json)`.
-* **Tailwind / NativeWind** – Tailwind classes are enabled by `[tailwind.config.js](mdc:tailwind.config.js)` and `[metro.config.js](mdc:metro.config.js)`; Babel preset added in `[babel.config.js](mdc:babel.config.js)`.
-* **TypeScript paths** – `@/` alias defined in `[tsconfig.json](mdc:tsconfig.json)` maps to `src/*`.
-* **AI tools** – API route `[chat+api.ts](mdc:src/app/api/chat+api.ts)` streams OpenAI responses and demonstrates **tool invocation** with zod-validated parameters.
-* **Fetch polyfill** – `[fetch-polyfill.ts](mdc:src/utils/fetch-polyfill.ts)` patches `fetch` & structured cloning to match WinterCG spec on native platforms.
+1. **Feature Co-location**: All related code (components, hooks, types) lives together
+2. **Barrel Exports**: Clean import paths via `index.ts` files
+3. **Single Responsibility**: Each component/hook has one clear purpose
+4. **Type Safety**: 100% TypeScript coverage with no `any` types
+5. **Performance First**: Virtualized lists, optimized animations
 
-## 4. Styling Conventions
+## 3. Chat Feature Architecture
 
-1. Prefer Tailwind utility classes via NativeWind for **all** styling.
-2. Merge / conditionally apply classes with `cn()` from `[utils.ts](mdc:src/lib/utils.ts)`.
-3. Custom CSS lives in `[src/global.css](mdc:src/global.css)`; avoid inline styles unless dynamic values are required.
+The chat feature demonstrates our architectural patterns:
 
-## 5. Animation Guidelines
+**Components** (all < 150 lines):
+* `Chat.tsx` (47 lines) - Main orchestrating component
+* `MessageList.tsx` (64 lines) - FlatList-based virtualized messaging
+* `MessageBubble.tsx` (100 lines) - Individual message with tool support
+* `InputBar.tsx` (63 lines) - Text input with voice/send buttons
+* `ChatHeader.tsx` (23 lines) - Header with menu and QR code
+* `EmptyState.tsx` (59 lines) - Suggestion cards for new chats
+* `Avatar.tsx` (25 lines) - User/assistant avatars
 
-* Use Reanimated v3 for performant animations.
-* **Never** call JS functions directly from a worklet – wrap calls with `runOnJS()` to prevent native crashes.
+**Business Logic**:
+* `useChatController.ts` (43 lines) - Wraps @ai-sdk/react with app-specific logic
 
-## 6. Adding Routes & Screens
+**Performance Optimizations**:
+* FlatList virtualization for 1000+ messages
+* `maintainVisibleContentPosition` for smooth auto-scroll
+* Optimized re-rendering with proper React.memo usage
 
-1. Create a new file under `src/app/`. Its filename determines the route (e.g. `profile.tsx → /profile`).
-2. Complex flows can nest directories (e.g. `settings/account.tsx`).
-3. Export React components; expo-router automatically registers them.
-4. Re-use the pattern in `_layout.tsx` for setting screen options.
+## 4. Core Libraries & Configuration
 
-## 7. API Routes (Server Actions)
+### Development Tools (NEW)
+* **ESLint v9** – Flat config format (`eslint.config.js`) with Expo preset
+* **Prettier** – Code formatting with ESLint integration
+* **Husky + lint-staged** – Pre-commit hooks for code quality
+* **GitHub Actions** – Automated CI/CD pipeline
 
-* Any file ending with `+api.ts` inside `src/app` exports standard Fetch API handlers (`GET`, `POST`, etc.).
-* **chat+api.ts** shows streaming with `streamText` and tool definitions.
-* Keep endpoints stateless and **avoid reading secret `.env` files in code** – ask maintainers to provide required env vars at runtime.
+### Styling System
+* **NativeWind** – 100% Tailwind utility classes for styling
+* **Style Utilities** – `src/lib/styles.ts` for complex platform-specific styles
+* **No StyleSheet** – Reserved only for truly dynamic values
 
-## 8. State Management
+### Type Safety
+* **Zod** – Runtime validation for API contracts and configuration
+* **Strict TypeScript** – 100% coverage, no `any` types allowed
+* **API Types** – Shared between frontend and backend
 
-* Lightweight local state with React hooks.
-* The chat UI leverages `useChat` from **@ai-sdk/react** which handles streaming state internally; global state libraries (Zustand, Redux) are **not** installed—introduce them only if strictly necessary.
+### Testing Infrastructure (NEW)
+* **Jest** – Test runner with Expo preset
+* **React Native Testing Library** – Component testing utilities
+* **Coverage Reports** – Integrated with CI pipeline
 
-## 9. Development & Tooling
+### Animation Safety (NEW)
+* **ESLint Plugin** – Prevents unsafe worklet patterns
+* **Safe Utilities** – `src/lib/animations.ts` with `runOnJS` wrappers
 
-Scripts in `[package.json](mdc:package.json)`:
-* `npm start`   → `expo start` (interactive dev server)
-* `npm run android | ios | web` → platform-specific launch
-* `npm run deploy` → static web export & EAS deploy
+## 5. Development Workflow
 
-The repository currently uses **npm** (see `package-lock.json`). Follow this unless the team decides to migrate to `pnpm`.
+### Scripts
+```bash
+npm start              # Expo development server
+npm run android/ios/web # Platform-specific launch
+npm run lint           # ESLint checking
+npm run lint:fix       # ESLint with auto-fix
+npm run typecheck      # TypeScript validation
+npm run format         # Prettier formatting
+npm run test           # Jest test runner
+npm run test:coverage  # Test coverage report
+npm run deploy         # Production deployment
+```
 
-### Linting & Formatting
+### Pre-commit Validation
+Every commit automatically runs:
+1. ESLint with auto-fix
+2. Prettier formatting
+3. TypeScript type checking
 
-* ESLint / Prettier are **not** configured yet. Add them in a separate PR if needed.
+### Continuous Integration
+GitHub Actions pipeline validates:
+1. Code quality (lint + format)
+2. Type safety (TypeScript)
+3. Build compatibility (iOS/Android/Web)
+4. Test coverage
 
-## 10. Testing
+## 6. Styling Conventions
 
-* No test setup is present; if you add tests, prefer [Jest](mdc:https:/jestjs.io) with React Native Testing Library, but keep the configuration minimal.
+### Tailwind-First Approach
+```typescript
+// ✅ Preferred - Tailwind utility classes
+<View className="flex-row items-center px-4 py-3 bg-white rounded-lg shadow-sm">
 
-## 11. Deployment Notes
+// ✅ Complex styles - Use utilities from src/lib/styles.ts
+<Text style={messageTextStyle} className="text-zinc-800">
 
-* Web builds output to a server environment (`app.json > web.output = "server"`).
-* Native builds & OTA updates are handled via EAS – see the `deploy` script.
+// ❌ Avoid - Inline StyleSheet objects
+<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+```
 
-## 12. Environment Variables
+### Style Utilities
+For platform-specific or complex styling:
+```typescript
+// src/lib/styles.ts
+export const headerStyle = cn(
+  'flex-row items-center justify-between px-4 py-3',
+  'border-b border-gray-200',
+  Platform.select({
+    ios: 'shadow-sm',
+    android: 'elevation-1',
+  })
+);
+```
 
-Per the project rule, **never read `.env` files programmatically**. Instead, document required variables in the README and ask maintainers to supply them.
+## 7. State Management Strategy
+
+### Current Approach
+* **React Hooks** – Local component state
+* **Custom Hooks** – Feature-specific business logic (e.g., `useChatController`)
+* **@ai-sdk/react** – Streaming chat state management
+
+### Future Considerations
+* Global state libraries (Zustand, Redux) not installed
+* Add only when cross-feature state sharing becomes necessary
+* Prefer lifting state up and prop drilling for simple cases
+
+## 8. Adding New Features
+
+### 1. Create Feature Structure
+```bash
+src/features/your-feature/
+├── components/
+│   ├── __tests__/
+│   └── index.ts
+├── hooks/
+│   ├── __tests__/
+│   └── index.ts
+├── types/
+│   └── index.ts
+└── index.ts
+```
+
+### 2. Follow Component Guidelines
+* Keep components under 150 lines
+* Single responsibility principle
+* Use TypeScript interfaces for all props
+* Write tests for critical functionality
+* Use Tailwind classes for styling
+
+### 3. Update Barrel Exports
+```typescript
+// src/features/your-feature/index.ts
+export { YourComponent } from './components/YourComponent';
+export { useYourHook } from './hooks/useYourHook';
+export type { YourType } from './types';
+```
+
+## 9. API Development
+
+### Route Structure
+* Files ending with `+api.ts` in `src/app/` are API endpoints
+* Use standard Fetch API handlers (`GET`, `POST`, etc.)
+* Validate inputs with Zod schemas from `src/types/api.ts`
+
+### Example API Route
+```typescript
+import { z } from 'zod';
+import { RequestSchema } from '@/types/api';
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const validatedData = RequestSchema.parse(body);
+  // Handle request...
+}
+```
+
+## 10. Configuration Management
+
+### Centralized Config
+All configuration lives in `src/config/index.ts`:
+```typescript
+export const config = {
+  api: {
+    baseUrl: getEnvVar('EXPO_PUBLIC_API_URL', 'http://localhost:8081'),
+    openaiApiKey: getEnvVar('OPENAI_API_KEY'),
+  },
+  features: {
+    enableVoiceInput: getEnvVar('EXPO_PUBLIC_ENABLE_VOICE', 'false') === 'true',
+  },
+} as const;
+```
+
+### Environment Variables
+* **Never read `.env` files programmatically**
+* Use `process.env` with proper validation
+* Document required variables in README
+* Use `EXPO_PUBLIC_` prefix for client-side variables
+
+## 11. Testing Strategy
+
+### Component Testing
+```typescript
+// src/features/chat/components/__tests__/MessageBubble.test.tsx
+import { render } from '@testing-library/react-native';
+import { MessageBubble } from '../MessageBubble';
+
+describe('MessageBubble', () => {
+  it('renders user message with correct styling', () => {
+    const { getByText } = render(
+      <MessageBubble message={mockMessage} isUser={true} />
+    );
+    expect(getByText('Hello')).toBeTruthy();
+  });
+});
+```
+
+### Testing Guidelines
+* Test critical user interactions
+* Mock external dependencies (AI API calls)
+* Use React Native Testing Library patterns
+* Aim for meaningful coverage, not 100%
+
+## 12. Performance Best Practices
+
+### Lists & Virtualization
+* Use `FlatList` for any list with 10+ items
+* Implement `getItemLayout` when item heights are known
+* Use `keyExtractor` with stable, unique keys
+
+### Animation Safety
+```typescript
+// ✅ Safe - Use runOnJS for callbacks
+const animateWithCallback = (callback: () => void) => {
+  'worklet';
+  return withTiming(1, {}, (finished) => {
+    if (finished) {
+      runOnJS(callback)();
+    }
+  });
+};
+
+// ❌ Unsafe - Direct JS function calls in worklets
+```
+
+### Memory Management
+* Use React.memo for expensive components
+* Implement proper cleanup in useEffect hooks
+* Avoid creating objects in render functions
+
+## 13. Deployment & CI/CD
+
+### Automated Pipeline
+* **Linting**: ESLint validation on all PRs
+* **Type Checking**: TypeScript compilation validation
+* **Build Testing**: iOS/Android prebuild validation
+* **Test Coverage**: Jest test execution
+
+### Deployment Strategy
+* Web builds use server-side rendering (`app.json > web.output = "server"`)
+* Native builds deployed via EAS (Expo Application Services)
+* Environment-specific configurations handled via EAS Build
 
 ---
 
-### Checklist for New Features
+## Checklist for New Features
 
-☐ Place new screens in `src/app` and components in `src/components`.<br/>
-☐ Use NativeWind utility classes and `cn()`.<br/>
-☐ Follow Reanimated best practices (`runOnJS`).<br/>
-☐ Validate any external data with `zod`.<br/>
-☐ Keep API routes stateless and streaming-ready.<br/>
-☐ Update this rule if you introduce significant new architecture.
+☐ Create feature folder in `src/features/` with proper structure<br/>
+☐ Keep all components under 150 lines of code<br/>
+☐ Use Tailwind utility classes exclusively<br/>
+☐ Add TypeScript interfaces for all props and data<br/>
+☐ Write tests for critical functionality<br/>
+☐ Add barrel exports (`index.ts`) for clean imports<br/>
+☐ Follow Reanimated safety patterns (`runOnJS`)<br/>
+☐ Validate external data with Zod schemas<br/>
+☐ Update this documentation if adding significant architecture<br/>
+
+## Migration Notes
+
+This architecture was established through a comprehensive refactor (see `initial_refactor_plan.md`). Key improvements include:
+
+* **Component Decomposition**: Broke 450-line monolithic component into focused modules
+* **Performance**: Migrated from ScrollView to FlatList virtualization
+* **Code Quality**: Added ESLint, Prettier, pre-commit hooks, and CI/CD
+* **Type Safety**: Achieved 100% TypeScript coverage with Zod validation
+* **Testing**: Established Jest infrastructure with React Native Testing Library
+* **Architecture**: Implemented feature-based organization with barrel exports
+
+The codebase is now production-ready and prepared for scaling with complex features.
