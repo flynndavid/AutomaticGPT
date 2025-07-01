@@ -1,5 +1,6 @@
-import { ScrollView, Pressable, Text } from 'react-native';
+import { ScrollView, Pressable, Text, View } from 'react-native';
 import { useTheme } from '@/features/shared';
+import { suggestionCardShadow } from '@/lib/styles';
 
 const suggestions = [
   {
@@ -37,27 +38,28 @@ export function EmptyState({ onSuggestionPress }: EmptyStateProps) {
   };
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      className="mb-2"
-      contentContainerStyle={{
-        paddingHorizontal: 16,
-        gap: 8,
-      }}
-    >
-      {suggestions.map((suggestion) => (
-        <Pressable
-          key={suggestion.id}
-          onPress={() => handleSuggestionPress(suggestion.title, suggestion.subtitle)}
-          className="bg-card rounded-xl px-3 py-2 border border-border min-w-[140px] max-w-[180px]"
-        >
-          <Text className="text-md font-semibold text-foreground mb-0.5">{suggestion.title}</Text>
-          <Text className="text-sm text-muted-foreground leading-[14px]">
-            {suggestion.subtitle}
-          </Text>
-        </Pressable>
-      ))}
-    </ScrollView>
+    <View className="mb-4">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingVertical: 8,
+          gap: 12,
+        }}
+      >
+        {suggestions.map((suggestion) => (
+          <Pressable
+            key={suggestion.id}
+            onPress={() => handleSuggestionPress(suggestion.title, suggestion.subtitle)}
+            className="bg-card rounded-xl border border-border/5 px-4 py-4 min-w-[160px] max-w-[200px]"
+            style={suggestionCardShadow}
+          >
+            <Text className="text-lg font-semibold text-foreground mb-1">{suggestion.title}</Text>
+            <Text className="text-base text-muted-foreground leading-5">{suggestion.subtitle}</Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </View>
   );
 }

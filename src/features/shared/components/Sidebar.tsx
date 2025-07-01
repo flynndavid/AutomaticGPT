@@ -23,10 +23,10 @@ interface SidebarProps {
 
 // Dummy data for navigation and chat history
 const navigationItems = [
-  { id: 'chat', label: 'New Chat', icon: 'chatbubbles-outline' },
-  { id: 'history', label: 'Chat History', icon: 'time-outline' },
-  { id: 'settings', label: 'Settings', icon: 'settings-outline' },
-  { id: 'help', label: 'Help & Support', icon: 'help-circle-outline' },
+  { id: 'chat', label: 'Chat', icon: 'chatbubbles-outline' },
+  { id: 'documents', label: 'Documents', icon: 'document-text-outline' },
+  { id: 'memories', label: 'Memories', icon: 'library-outline' },
+  { id: 'connections', label: 'Connections', icon: 'people-outline' },
 ];
 
 const chatHistory = [
@@ -40,6 +40,7 @@ const chatHistory = [
 const profileMenuItems = [
   { id: 'profile', label: 'Profile', icon: 'person-outline' },
   { id: 'billing', label: 'Billing', icon: 'card-outline' },
+  { id: 'theme', label: 'Theme', icon: 'contrast-outline' },
   { id: 'share', label: 'Share App', icon: 'share-outline' },
   { id: 'logout', label: 'Log Out', icon: 'log-out-outline' },
 ];
@@ -52,7 +53,7 @@ export function Sidebar({
   userEmail = 'john.doe@example.com',
   userAvatar,
 }: SidebarProps) {
-  const { isDark } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
   const translateX = useSharedValue(isOpen ? 0 : -300);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -98,8 +99,13 @@ export function Sidebar({
 
   const handleProfileMenuPress = (itemId: string) => {
     console.log(`Profile action: ${itemId}`);
+
+    if (itemId === 'theme') {
+      toggleTheme();
+    }
+
     setIsProfileMenuOpen(false);
-    // TODO: Implement profile actions
+    // TODO: Implement other profile actions
   };
 
   if (!isOpen) return null;
@@ -219,7 +225,12 @@ export function Sidebar({
                   className="flex-row items-center px-6 py-3 active:bg-muted"
                 >
                   <Ionicons name={item.icon as any} size={18} color={isDark ? '#9ca3af' : '#666'} />
-                  <Text className="ml-3 text-sm text-foreground">{item.label}</Text>
+                  <Text className="ml-3 text-sm text-foreground">
+                    {item.label}
+                    {item.id === 'theme' && (
+                      <Text className="text-muted-foreground"> ({isDark ? 'Dark' : 'Light'})</Text>
+                    )}
+                  </Text>
                 </Pressable>
               ))}
             </View>

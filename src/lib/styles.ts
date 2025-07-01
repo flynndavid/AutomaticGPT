@@ -25,12 +25,33 @@ export const headerStyle = cn(
 
 /**
  * Card styling with platform-specific elevation
+ * Provides consistent shadow/elevation across platforms
  */
 export const cardStyle = cn(
-  'bg-white rounded-xl p-4',
+  'bg-input rounded-xl border border-border/10',
   Platform.select({
     ios: 'shadow-sm',
-    android: '',
-    web: 'shadow-sm',
+    android: 'elevation-2',
+    web: 'shadow-md',
   })
 );
+
+/**
+ * Suggestion card shadow style
+ * Platform-specific shadow properties for better visual consistency
+ */
+export const suggestionCardShadow = Platform.select({
+  ios: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+  android: {
+    elevation: 4,
+  },
+  web: {
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+  },
+  default: {},
+});
