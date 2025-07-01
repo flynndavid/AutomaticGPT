@@ -1,8 +1,9 @@
 import { useChat } from '@ai-sdk/react';
 import { useEffect, useState } from 'react';
-import * as Haptics from 'expo-haptics';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useConversation } from './useConversation';
+import { logger } from '@/lib/logger';
+import { haptics } from '@/lib/haptics';
 
 interface UseChatControllerProps {
   conversationId: string | null;
@@ -33,7 +34,7 @@ export function useChatController(
     },
     onFinish: (message) => {
       // Conversation should be created by now if needed
-      console.log('Chat finished:', message);
+      logger.log('Chat finished:', message);
     },
   });
 
@@ -72,13 +73,13 @@ export function useChatController(
     // The parent hook (useChatManager) is now responsible for creating the conversation.
     // This hook will only proceed if a conversationId is present.
     if (!conversationId) {
-      console.warn('onSend called without a conversationId. The message will not be sent.');
+      logger.warn('onSend called without a conversationId. The message will not be sent.');
       // Optionally, you could trigger a callback here to notify the parent
       // that a conversation is needed, but the current design handles this.
       return;
     }
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.messageSent();
     handleSubmit();
   };
 

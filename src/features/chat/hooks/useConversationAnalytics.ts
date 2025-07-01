@@ -3,9 +3,10 @@
  * Provides advanced analytics for conversations and messages
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '@/lib/supabase';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { logger } from '@/lib/logger';
 
 export interface ConversationStats {
   totalConversations: number;
@@ -184,7 +185,7 @@ export const useConversationAnalytics = (): UseConversationAnalyticsReturn => {
 
       setAnalytics(detailedAnalytics);
     } catch (err) {
-      console.error('Error fetching analytics:', err);
+      logger.error('Error fetching analytics:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch analytics'));
     } finally {
       setLoading(false);
@@ -243,7 +244,7 @@ export const useConversationAnalytics = (): UseConversationAnalyticsReturn => {
           assistantMessageCount: assistantMessages.length,
         };
       } catch (err) {
-        console.error('Error fetching conversation analytics:', err);
+        logger.error('Error fetching conversation analytics:', err);
         return null;
       }
     },
@@ -299,7 +300,7 @@ export const useConversationAnalytics = (): UseConversationAnalyticsReturn => {
           return csvContent;
         }
       } catch (err) {
-        console.error('Error exporting data:', err);
+        logger.error('Error exporting data:', err);
         return null;
       }
     },

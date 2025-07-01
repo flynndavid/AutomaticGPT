@@ -4,10 +4,51 @@
     "userInterfaceStyle": "automatic",
     "orientation": "default",
     "web": {
-      "output": "server"
+      "output": "server",
+      "bundler": "metro"
+    },
+    "optimization": {
+      "web": {
+        "bundler": "metro"
+      }
+    },
+    "experiments": {
+      "turboModules": true,
+      "newArchEnabled": false
     },
     "plugins": ["expo-router"],
     "name": "automatic-sandbox-expo-1",
-    "slug": "automatic-sandbox-expo-1"
+    "slug": "automatic-sandbox-expo-1",
+    "ios": {
+      "bundleIdentifier": "com.automaticsandbox.expo1",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "requireFullScreen": false,
+      "userInterfaceStyle": "automatic",
+      "backgroundColor": "#000000",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "splash": {
+        "image": "./assets/images/logo_icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
+      "infoPlist": {
+        "UILaunchStoryboardName": "SplashScreen",
+        "UIStatusBarStyle": "UIStatusBarStyleDefault",
+        "UIViewControllerBasedStatusBarAppearance": true,
+        "NSCameraUsageDescription": "This app uses the camera to capture photos for sharing.",
+        "NSMicrophoneUsageDescription": "This app uses the microphone for voice input."
+      }
+    },
+    "android": {
+      "package": "com.automaticsandbox.expo1",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo_icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    }
   }
 }
