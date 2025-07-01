@@ -1,4 +1,5 @@
-import { Text, View, SafeAreaView, StatusBar } from 'react-native';
+import { Text, View, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardPaddingView, useTheme, Sidebar, useSidebar } from '@/features/shared';
 import { useChatController } from '../hooks/useChatController';
 import { ChatHeader } from './ChatHeader';
@@ -14,7 +15,7 @@ export function Chat() {
 
   if (error) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
         <StatusBar
           barStyle={isDark ? 'light-content' : 'dark-content'}
           backgroundColor={isDark ? '#0f0f11' : '#fafaf9'}
@@ -27,7 +28,7 @@ export function Chat() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={isDark ? '#0f0f11' : '#fafaf9'}
@@ -37,16 +38,16 @@ export function Chat() {
       <View className="flex-1">
         <MessageList messages={messages} isLoading={isLoading} />
 
-        <View className="bg-background pb-4">
+        <View className="bg-background">
           {messages.length === 0 && <EmptyState onSuggestionPress={handleSuggestionPress} />}
-
-          <InputBar
-            input={input}
-            onInputChange={handleInputChange}
-            onSend={onSend}
-            isLoading={isLoading}
-          />
         </View>
+
+        <InputBar
+          input={input}
+          onInputChange={handleInputChange}
+          onSend={onSend}
+          isLoading={isLoading}
+        />
         <KeyboardPaddingView />
       </View>
 

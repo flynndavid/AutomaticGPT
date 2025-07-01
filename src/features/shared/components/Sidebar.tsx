@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, View, Pressable, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
@@ -10,6 +10,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../hooks/useTheme';
 import { animationConfigs } from '@/lib/animations';
+import { config } from '@/config';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ const profileMenuItems = [
 export function Sidebar({
   isOpen,
   onClose,
-  appName = 'ChatApp',
+  appName,
   userName = 'John Doe',
   userEmail = 'john.doe@example.com',
   userAvatar,
@@ -54,6 +55,10 @@ export function Sidebar({
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const translateX = useSharedValue(isOpen ? 0 : -300);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  // Use app name from config if not provided as prop
+  const displayAppName = appName || config.branding.appName;
 
   // Animation styles
   const sidebarStyle = useAnimatedStyle(() => ({
@@ -87,8 +92,13 @@ export function Sidebar({
     // TODO: Implement chat loading
   };
 
+  const handleProfilePress = () => {
+    setIsProfileMenuOpen(!isProfileMenuOpen);
+  };
+
   const handleProfileMenuPress = (itemId: string) => {
     console.log(`Profile action: ${itemId}`);
+    setIsProfileMenuOpen(false);
     // TODO: Implement profile actions
   };
 
@@ -126,16 +136,13 @@ export function Sidebar({
       >
         <ScrollView className="flex-1">
           {/* Header Section */}
-          <View className="px-6 py-4 border-b border-border">
-            <View className="flex-row items-center justify-between mb-2">
-              <Text className="text-xl font-bold text-foreground">{appName}</Text>
+          <View className="px-6 py-4">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-xl font-bold text-foreground">{displayAppName}</Text>
               <Pressable onPress={onClose} className="w-8 h-8 items-center justify-center">
                 <Ionicons name="close" size={20} color={isDark ? '#fff' : '#000'} />
               </Pressable>
             </View>
-            <Pressable className="self-start">
-              <Ionicons name="ellipsis-horizontal" size={20} color={isDark ? '#9ca3af' : '#666'} />
-            </Pressable>
           </View>
 
           {/* Navigation Section */}
@@ -156,7 +163,7 @@ export function Sidebar({
           </View>
 
           {/* Chat History Section */}
-          <View className="py-4 border-t border-border">
+          <View className="py-4">
             <Text className="text-sm font-semibold text-muted-foreground px-6 mb-3 uppercase tracking-wider">
               Recent Chats
             </Text>
@@ -176,8 +183,8 @@ export function Sidebar({
         </ScrollView>
 
         {/* User Profile Section - Sticky at bottom */}
-        <View className="border-t border-border bg-card">
-          <Pressable className="flex-row items-center px-6 py-4">
+        <View className="bg-card">
+          <Pressable onPress={handleProfilePress} className="flex-row items-center px-6 py-4">
             <View className="w-10 h-10 rounded-full bg-primary items-center justify-center mr-3">
               {userAvatar ? (
                 <Image source={{ uri: userAvatar }} className="w-10 h-10 rounded-full" />
@@ -195,22 +202,28 @@ export function Sidebar({
                 {userEmail}
               </Text>
             </View>
-            <Ionicons name="chevron-up" size={16} color={isDark ? '#9ca3af' : '#666'} />
+            <Ionicons
+              name={isProfileMenuOpen ? 'chevron-down' : 'chevron-up'}
+              size={16}
+              color={isDark ? '#9ca3af' : '#666'}
+            />
           </Pressable>
 
-          {/* Profile Menu (would be a dropdown in real implementation) */}
-          <View className="border-t border-border/50">
-            {profileMenuItems.map((item) => (
-              <Pressable
-                key={item.id}
-                onPress={() => handleProfileMenuPress(item.id)}
-                className="flex-row items-center px-6 py-3 active:bg-muted"
-              >
-                <Ionicons name={item.icon as any} size={18} color={isDark ? '#9ca3af' : '#666'} />
-                <Text className="ml-3 text-sm text-foreground">{item.label}</Text>
-              </Pressable>
-            ))}
-          </View>
+          {/* Profile Dropdown Menu */}
+          {isProfileMenuOpen && (
+            <View className="border-t border-border/50">
+              {profileMenuItems.map((item) => (
+                <Pressable
+                  key={item.id}
+                  onPress={() => handleProfileMenuPress(item.id)}
+                  className="flex-row items-center px-6 py-3 active:bg-muted"
+                >
+                  <Ionicons name={item.icon as any} size={18} color={isDark ? '#9ca3af' : '#666'} />
+                  <Text className="ml-3 text-sm text-foreground">{item.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
         </View>
       </Animated.View>
     </>

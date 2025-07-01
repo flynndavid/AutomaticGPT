@@ -4,6 +4,7 @@ import Animated, { Layout, Easing, FadeIn } from 'react-native-reanimated';
 import Markdown from 'react-native-markdown-display';
 import { UIMessage } from 'ai';
 import { cn } from '@/lib/utils';
+import { messageTextStyle } from '@/lib/styles';
 import { Avatar } from './Avatar';
 import { WeatherCard, CelsiusConvertCard, useTheme } from '@/features/shared';
 
@@ -26,8 +27,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               style={{
                 body: {
                   color: isUser ? '#ffffff' : isDark ? '#fafaf9' : '#27272a',
-                  fontSize: 17,
-                  lineHeight: 22,
+                  fontSize: messageTextStyle.fontSize,
+                  lineHeight: messageTextStyle.lineHeight,
                 },
                 paragraph: {
                   marginTop: 0,

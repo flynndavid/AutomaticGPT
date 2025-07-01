@@ -20,6 +20,14 @@ module.exports = {
         accent: 'rgb(var(--accent) / <alpha-value>)',
         'accent-foreground': 'rgb(var(--accent-foreground) / <alpha-value>)',
       },
+      fontSize: {
+        xs: ['13px', '18px'], // was 12px/16px
+        sm: ['15px', '20px'], // was 14px/20px
+        base: ['17px', '24px'], // was 16px/24px
+        lg: ['19px', '28px'], // was 18px/28px
+        xl: ['21px', '28px'], // was 20px/28px
+        '2xl': ['25px', '32px'], // was 24px/32px
+      },
     },
   },
   future: {

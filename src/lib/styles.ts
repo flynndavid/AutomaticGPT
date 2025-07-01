@@ -7,7 +7,7 @@ import { cn } from './utils';
  */
 export const messageTextStyle = {
   fontSize: 17,
-  lineHeight: 22,
+  lineHeight: 24,
 } as const;
 
 /**
