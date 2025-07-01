@@ -3,7 +3,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "lib": ["ES2017"],
+    "strict": true
   },
   "extends": "expo/tsconfig.base",
   "include": ["global.d.ts", "**/*.ts", "**/*.tsx", "nativewind-env.d.ts"]

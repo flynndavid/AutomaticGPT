@@ -14,7 +14,7 @@ const getBooleanEnvVar = (key: string, fallback: boolean = false): boolean => {
 };
 
 /**
- * Core Features - Currently implemented
+ * Core Features - Currently implemented and working
  */
 export const CORE_FEATURES = {
   // UI Features
@@ -27,37 +27,48 @@ export const CORE_FEATURES = {
   enableOfflineMode: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_OFFLINE', false),
   enableAnalytics: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_ANALYTICS', false),
   enablePushNotifications: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_PUSH', false),
+
+  // Authentication & User Management (MOVED FROM TEMPLATE_FEATURES - FULLY IMPLEMENTED)
+  enableAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_AUTH', true),
+  enableEmailAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_EMAIL_AUTH', true),
+  enableProfile: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_PROFILE', true),
+  enableProfileManagement: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_PROFILE_MANAGEMENT', true),
+
+  // Navigation & Layout (MOVED FROM TEMPLATE_FEATURES - FULLY IMPLEMENTED)
+  enableOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_ONBOARDING', true),
+  enableSplashOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING', true),
+  enableSidebar: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SIDEBAR', true),
+  enableThemeCustomization: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_THEME_CUSTOMIZATION', true),
+
+  // Conversation System (NEWLY DISCOVERED - FULLY IMPLEMENTED)
+  enableConversationManagement: getBooleanEnvVar(
+    'EXPO_PUBLIC_ENABLE_CONVERSATION_MANAGEMENT',
+    true
+  ),
+  enableConversationAnalytics: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_CONVERSATION_ANALYTICS', true),
+  enableConversationSharing: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_CONVERSATION_SHARING', true),
 } as const;
 
 /**
  * Template Features - To be implemented in future phases
  */
 export const TEMPLATE_FEATURES = {
-  // Authentication & User Management
-  enableAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_AUTH', true),
+  // Authentication Extensions (not yet implemented)
   enableSocialAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SOCIAL_AUTH', false),
-  enableProfile: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_PROFILE', false),
-
-  // Auth Methods (individual control)
-  enableEmailAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_EMAIL_AUTH', true),
   enableSmsAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SMS_AUTH', false),
   enableGoogleAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_GOOGLE_AUTH', false),
   enableAppleAuth: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_APPLE_AUTH', false),
 
-  // Storage & File Management
+  // Storage & File Management (not yet implemented)
   enableStorage: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_STORAGE', false),
   enableFileUploads: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_FILE_UPLOADS', false),
 
-  // Navigation & Layout
-  enableOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_ONBOARDING', true),
-  enableSplashOnboarding: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SPLASH_ONBOARDING', true),
-  enableSidebar: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_SIDEBAR', true),
+  // Navigation Extensions (not yet implemented)
   enableTabNavigation: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_TAB_NAVIGATION', false),
 
-  // Advanced Features
+  // Advanced Features (not yet implemented)
   enableRealtime: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_REALTIME', false),
   enableNotifications: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_NOTIFICATIONS', false),
-  enableThemeCustomization: getBooleanEnvVar('EXPO_PUBLIC_ENABLE_THEME_CUSTOMIZATION', false),
 } as const;
 
 /**
@@ -72,11 +83,18 @@ export const FEATURES = {
  * Feature categories for better organization
  */
 export const FEATURE_CATEGORIES = {
-  ui: ['enableVoiceInput', 'enableDarkMode', 'enableHapticFeedback', 'enableAnimations'] as const,
+  ui: [
+    'enableVoiceInput',
+    'enableDarkMode',
+    'enableHapticFeedback',
+    'enableAnimations',
+    'enableThemeCustomization',
+  ] as const,
   auth: [
     'enableAuth',
     'enableSocialAuth',
     'enableProfile',
+    'enableProfileManagement',
     'enableEmailAuth',
     'enableSmsAuth',
     'enableGoogleAuth',
@@ -89,13 +107,17 @@ export const FEATURE_CATEGORIES = {
     'enableSidebar',
     'enableTabNavigation',
   ] as const,
+  conversations: [
+    'enableConversationManagement',
+    'enableConversationAnalytics',
+    'enableConversationSharing',
+  ] as const,
   advanced: [
     'enableOfflineMode',
     'enableAnalytics',
     'enablePushNotifications',
     'enableRealtime',
     'enableNotifications',
-    'enableThemeCustomization',
   ] as const,
 } as const;
 
