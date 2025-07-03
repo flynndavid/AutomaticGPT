@@ -1,7 +1,9 @@
-import { TextInput, View, Pressable, ActivityIndicator } from 'react-native';
+import { TextInput, View, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/features/shared';
+import { webInteractionUtils, webLayoutUtils } from '@/lib/styles';
+import { cn } from '@/lib/utils';
 
 interface InputBarProps {
   input: string;
