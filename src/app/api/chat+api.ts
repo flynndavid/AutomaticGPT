@@ -1,4 +1,5 @@
 import { openai } from '@ai-sdk/openai';
+import { anthropic } from '@ai-sdk/anthropic';
 import { streamText, tool } from 'ai';
 import { z } from 'zod';
 import {
@@ -9,12 +10,34 @@ import {
   CelsiusConvertResultSchema,
 } from '@/types/api';
 import { db } from '@/lib/supabase';
+import { getModelById, DEFAULT_MODEL_ID } from '@/config/models';
+
+// Helper function to get the correct AI model instance
+function getAIModel(modelId: string) {
+  const model = getModelById(modelId);
+  if (!model) {
+    throw new Error(`Model not found: ${modelId}`);
+  }
+
+  switch (model.provider) {
+    case 'openai':
+      return openai(modelId);
+    case 'anthropic':
+      return anthropic(modelId);
+    default:
+      throw new Error(`Unsupported provider: ${model.provider}`);
+  }
+}
 
 export async function POST(req: Request) {
   try {
     const requestBody = await req.json();
     const validatedRequest = ChatRequestSchema.parse(requestBody);
-    const { messages, conversationId, userId, saveMessages = true } = validatedRequest;
+    const { messages, conversationId, userId, saveMessages = true, model: requestedModel } = validatedRequest;
+
+    // Use the requested model or fall back to default
+    const modelId = requestedModel || DEFAULT_MODEL_ID;
+    const aiModel = getAIModel(modelId);
 
     console.log('post messages:', messages);
     console.log('conversation ID:', conversationId);
@@ -47,7 +70,7 @@ export async function POST(req: Request) {
     const startTime = Date.now();
 
     const result = streamText({
-      model: openai('gpt-4o'),
+      model: aiModel,
       messages: messages.map((msg) => ({
         role: msg.role,
         content: msg.content || '',
@@ -105,7 +128,7 @@ export async function POST(req: Request) {
                 finish_reason: completion.finishReason,
                 usage: completion.usage,
               },
-              model_used: 'gpt-4o',
+              model_used: modelId,
               tokens_used: completion.usage?.totalTokens || null,
               response_time_ms: responseTime,
               tool_calls: completion.toolCalls || [],

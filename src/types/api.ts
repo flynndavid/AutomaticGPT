@@ -15,6 +15,7 @@ export const ChatRequestSchema = z.object({
   conversationId: z.string().uuid().optional(),
   userId: z.string().uuid().optional(),
   saveMessages: z.boolean().optional().default(true),
+  model: z.string().optional(),
 });
 
 export const ChatResponseSchema = z.object({
