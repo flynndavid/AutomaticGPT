@@ -63,7 +63,7 @@ export function useChatController(
       target: {
         value: text,
       },
-    } as React.ChangeEvent<HTMLInputElement>);
+    } as any);
   };
 
   const onSend = async () => {

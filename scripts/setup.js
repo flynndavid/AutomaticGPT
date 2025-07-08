@@ -64,7 +64,8 @@ async function setupTemplate() {
 • 🔗 Conversation Sharing
 • 🎨 Theme Customization & Navigation
 
-${colors.green}Let's get you set up quickly!${colors.reset}\n`
+${colors.green}This wizard will help you configure your app quickly!${colors.reset}
+${colors.cyan}Alternatively, you can skip this and manually copy .env.example to .env.local${colors.reset}\n`
   );
 
   try {
@@ -163,6 +164,13 @@ async function setupOpenAIConfig() {
 
 async function generateEnvFile(config) {
   const envPath = path.join(process.cwd(), '.env.local');
+
+  // Check if .env.local already exists
+  if (fs.existsSync(envPath)) {
+    log.warning('.env.local already exists - skipping file creation');
+    log.info('To reconfigure, either delete .env.local or edit it manually');
+    return;
+  }
 
   const envContent = `# =============================================================================
 # EXPO AI TEMPLATE - ENVIRONMENT CONFIGURATION
@@ -351,7 +359,8 @@ function showCompletionMessage(config) {
 
   log.info('Customization:');
   console.log('📝 Edit .env.local to customize features and branding');
-  console.log('📖 See docs/FEATURES.md for all available options');
+  console.log('📄 Reference .env.example for all available configuration options');
+  console.log('📖 See docs/FEATURES.md for detailed feature documentation');
   console.log('🎨 Modify colors, themes, and feature flags as needed');
   console.log();
 

@@ -19,6 +19,13 @@ This app was created using the [AutomaticGPT Template](https://github.com/flynnd
 # Install dependencies
 npm install
 
+# Optional: Run interactive setup wizard
+npm run setup
+
+# Or manually copy environment config
+cp .env.example .env.local
+# Then edit .env.local with your actual values
+
 # Start the development server
 npm run start
 
@@ -84,7 +91,22 @@ npm run web     # Web Browser
 
 ### Environment Variables
 
-Copy `.env.example` to `.env.local` and configure:
+Choose one of these setup methods:
+
+**Option 1: Interactive Setup (Recommended for newcomers)**
+
+```bash
+npm run setup
+```
+
+**Option 2: Manual Setup (Preferred by experienced developers)**
+
+```bash
+cp .env.example .env.local
+# Then edit .env.local with your actual values
+```
+
+The `.env.example` file contains all available configuration options with documentation:
 
 ```bash
 # Required - OpenAI API Key

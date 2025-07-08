@@ -11,7 +11,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const { colorScheme } = useColorScheme();
 
   return (
-    <View style={themes[colorScheme]} className="flex-1">
+    <View style={themes[colorScheme ?? 'light']} className="flex-1">
       {children}
     </View>
   );

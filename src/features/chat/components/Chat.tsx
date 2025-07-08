@@ -67,7 +67,7 @@ export function Chat() {
         onClose={sidebar.close}
         appName="AI Assistant"
         onConversationSelect={handleConversationSelect}
-        currentConversationId={currentConversationId}
+        currentConversationId={currentConversationId ?? undefined}
       />
     </SafeAreaView>
   );

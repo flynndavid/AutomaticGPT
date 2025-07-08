@@ -1,7 +1,9 @@
 import '../global.css';
 import '@/utils/fetch-polyfill';
+import '@/lib/reanimated-config';
 
 import React, { useEffect } from 'react';
+import { LogBox } from 'react-native';
 import { Stack } from 'expo-router';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 import { SplashScreen } from '@/features/splash';
@@ -13,6 +15,12 @@ export { ErrorBoundary } from 'expo-router';
 
 // Keep the splash screen visible while we fetch resources
 ExpoSplashScreen.preventAutoHideAsync();
+
+// Disable Reanimated strict mode warnings
+LogBox.ignoreLogs([
+  '[Reanimated] Reading from `value` during component render',
+  '[Reanimated] Writing to `value` during component render',
+]);
 
 function RootLayoutNav() {
   const { error, clearError } = useAuth();

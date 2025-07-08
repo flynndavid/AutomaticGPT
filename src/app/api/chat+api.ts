@@ -9,6 +9,7 @@ import {
   CelsiusConvertResultSchema,
 } from '@/types/api';
 import { db } from '@/lib/supabase';
+import { randomUUID } from 'crypto';
 
 export async function POST(req: Request) {
   try {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
             role: lastMessage.role,
             metadata: {
               timestamp: new Date().toISOString(),
-              client_id: lastMessage.id || crypto.randomUUID(),
+              client_id: lastMessage.id || randomUUID(),
             },
           });
           userMessageId = messageData?.id || null;

@@ -92,11 +92,6 @@ export function AuthScreen() {
           <View className="flex-1 justify-center px-6 py-8">
             {/* Logo */}
             <View className="items-center mb-12">
-              <Image
-                source={require('../../../../assets/images/logo_icon.png')}
-                className="w-16 h-16 mb-6"
-                resizeMode="contain"
-              />
               <Text className="text-2xl font-bold text-foreground">Welcome</Text>
               <Text className="text-base text-muted-foreground text-center mt-2">
                 Sign in or create an account to continue

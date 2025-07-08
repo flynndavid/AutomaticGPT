@@ -29,7 +29,11 @@ git clone https://github.com/your-username/your-repo-name.git
 cd your-repo-name
 ```
 
-### 2. Run Setup Wizard
+### 2. Configuration
+
+Choose your preferred setup method:
+
+**Option A: Interactive Setup Wizard (Recommended for newcomers)**
 
 ```bash
 # Install dependencies first
@@ -45,6 +49,19 @@ The setup wizard will guide you through:
 - ✨ Selecting features to enable
 - 🎨 Choosing your color scheme
 - 🔧 Setting up external services
+
+**Option B: Manual Configuration (Preferred by experienced developers)**
+
+```bash
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.example .env.local
+
+# Edit .env.local with your actual values using your preferred editor
+# The file contains detailed documentation for each variable
+```
 
 ### 3. Start Development
 
@@ -64,15 +81,17 @@ If you prefer to configure manually, follow these steps:
 
 ### 1. Environment Variables
 
-See the [Environment Configuration Guide](ENV_SETUP.md) for detailed instructions.
+The `.env.example` file contains all available configuration options with detailed documentation.
 
 Quick setup:
 
 ```bash
-# Create your environment file
-cp docs/ENV_SETUP.md .env
-# Then edit .env with your actual values
+# Copy the environment template
+cp .env.example .env.local
+# Then edit .env.local with your actual values
 ```
+
+For detailed environment variable documentation, see the [Environment Configuration Guide](ENV_SETUP.md).
 
 ### 2. App Configuration
 

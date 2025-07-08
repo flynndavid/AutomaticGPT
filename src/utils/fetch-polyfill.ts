@@ -16,6 +16,15 @@ import { polyfillGlobal } from 'react-native/Libraries/Utilities/PolyfillFunctio
 
 import { TextEncoderStream, TextDecoderStream } from '@stardazed/streams-text-encoding';
 
+// Type declarations for window
+declare const window:
+  | {
+      location?: {
+        origin?: string;
+      };
+    }
+  | undefined;
+
 interface ExpoExtraRouterConfig {
   router?: {
     origin?: string | URL | boolean;
@@ -64,7 +73,7 @@ const extra = manifest?.extra as ExpoExtraRouterConfig | null;
 
 function getOrigin() {
   assertOrigin();
-  return window.location?.origin;
+  return window?.location?.origin;
 }
 
 function assertOrigin() {
