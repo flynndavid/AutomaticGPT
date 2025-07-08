@@ -1,9 +1,10 @@
 {
-  "name": "create-expo-ai-template",
+  "name": "create-automaticgpt-template",
   "version": "1.0.0",
   "description": "AutomaticGPT - A production-ready Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
   "main": "expo-router/entry",
   "keywords": [
+    "automaticgpt",
     "expo",
     "template",
     "create-expo-app",
@@ -24,7 +25,8 @@
     "web",
     "cross-platform",
     "starter",
-    "boilerplate"
+    "boilerplate",
+    "create-automaticgpt-template"
   ],
   "author": {
     "name": "David Flynn",
