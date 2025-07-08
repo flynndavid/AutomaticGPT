@@ -7,7 +7,36 @@
       "output": "server"
     },
     "plugins": ["expo-router"],
-    "name": "Automatic ExpoGPT Template",
-    "slug": "automatic-expogpt-template"
+    "name": "AutomaticGPT",
+    "slug": "automaticgpt",
+    "version": "1.0.0",
+    "platforms": ["ios", "android", "web"],
+    "icon": "./assets/images/logo_icon.png",
+    "splash": {
+      "image": "./assets/images/logo_icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "bundleIdentifier": "com.yourcompany.automaticgpt",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["background-fetch"]
+      }
+    },
+    "android": {
+      "package": "com.yourcompany.automaticgpt",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo_icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-will-be-generated"
+      }
+    }
   }
 }

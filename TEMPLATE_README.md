@@ -4,7 +4,7 @@ A modern AI-powered mobile and web application built with Expo, featuring authen
 
 ## 🚀 Quick Start
 
-This app was created using the [Automatic ExpoGPT Template](https://github.com/yourusername/automatic-expogpt-template).
+This app was created using the [AutomaticGPT Template](https://github.com/flynndavid/AutomaticGPT).
 
 ### Prerequisites
 
@@ -203,8 +203,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - 📖 [Documentation](docs/)
-- 🐛 [Issues](https://github.com/yourusername/automatic-expogpt-template/issues)
-- 💬 [Discussions](https://github.com/yourusername/automatic-expogpt-template/discussions)
+- 🐛 [Issues](https://github.com/flynndavid/AutomaticGPT/issues)
+- 💬 [Discussions](https://github.com/flynndavid/AutomaticGPT/discussions)
 
 ---
 

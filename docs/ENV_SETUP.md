@@ -15,7 +15,7 @@ Create a `.env` file in the root of your project with the following variables:
 # Copy this to .env and update with your values
 
 # App Configuration
-EXPO_PUBLIC_APP_NAME=MyApp
+EXPO_PUBLIC_APP_NAME=AutomaticGPT
 EXPO_PUBLIC_APP_DESCRIPTION=Your AI-powered assistant
 
 # API Configuration

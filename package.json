@@ -1,7 +1,7 @@
 {
   "name": "create-expo-ai-template",
   "version": "1.0.0",
-  "description": "A production-ready Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
+  "description": "AutomaticGPT - A production-ready Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
   "main": "expo-router/entry",
   "keywords": [
     "expo",
@@ -33,12 +33,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/flynndavid/automatic-sandbox-expo-1.git"
+    "url": "https://github.com/flynndavid/AutomaticGPT.git"
   },
   "bugs": {
-    "url": "https://github.com/flynndavid/automatic-sandbox-expo-1/issues"
+    "url": "https://github.com/flynndavid/AutomaticGPT/issues"
   },
-  "homepage": "https://github.com/flynndavid/automatic-sandbox-expo-1#readme",
+  "homepage": "https://github.com/flynndavid/AutomaticGPT#readme",
   "files": [
     "src",
     "assets",
@@ -61,8 +61,8 @@
   ],
   "expo": {
     "template": {
-      "name": "AI-Powered Expo Template",
-      "description": "A comprehensive Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
+      "name": "AutomaticGPT Template",
+      "description": "AutomaticGPT - A comprehensive Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
       "icon": "./assets/images/logo_icon.png",
       "category": "ai",
       "features": [
@@ -87,6 +87,7 @@
     "web": "expo start --web",
     "deploy": "npx expo export -p web && npx eas-cli@latest deploy",
     "setup": "node scripts/setup.js",
+    "ios-setup": "node scripts/ios-setup.js",
     "postinstall": "node scripts/setup.js",
     "prepare": "husky",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",

@@ -1,10 +1,10 @@
-# Automatic ExpoGPT Template
+# AutomaticGPT
 
 A modern AI-powered mobile and web application built with Expo, featuring authentication, conversation management, analytics, and sharing capabilities.
 
 ## 🚀 Quick Start
 
-This app was created using the [Automatic ExpoGPT Template](https://github.com/yourusername/automatic-expogpt-template).
+This app was created using the [AutomaticGPT Template](https://github.com/flynndavid/AutomaticGPT).
 
 ### Prerequisites
 
@@ -96,8 +96,8 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY="your_supabase_anon_key"
 SUPABASE_SERVICE_ROLE_KEY="your_service_role_key"
 
 # App Configuration
-EXPO_PUBLIC_APP_NAME="Automatic ExpoGPT Template"
-EXPO_PUBLIC_APP_SLUG="automatic-expogpt-template"
+EXPO_PUBLIC_APP_NAME="AutomaticGPT"
+EXPO_PUBLIC_APP_SLUG="automaticgpt"
 
 # Feature Flags (all implemented features default to true)
 EXPO_PUBLIC_ENABLE_AUTH=true
@@ -203,8 +203,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - 📖 [Documentation](docs/)
-- 🐛 [Issues](https://github.com/yourusername/automatic-expogpt-template/issues)
-- 💬 [Discussions](https://github.com/yourusername/automatic-expogpt-template/discussions)
+- 🐛 [Issues](https://github.com/flynndavid/AutomaticGPT/issues)
+- 💬 [Discussions](https://github.com/flynndavid/AutomaticGPT/discussions)
 
 ---
 
