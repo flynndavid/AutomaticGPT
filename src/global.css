@@ -1,3 +1,134 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Web-specific styles for desktop experience */
+@media (min-width: 768px) {
+  /* Smooth scrolling for web */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better text selection */
+  * {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
+  /* Disable text selection for interactive elements */
+  button, 
+  [role="button"], 
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Custom scrollbar styling for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.5);
+  }
+
+  /* Focus styles for keyboard navigation */
+  *:focus-visible {
+    outline: 2px solid rgb(59, 130, 246);
+    outline-offset: 2px;
+  }
+
+  /* Better hover transitions */
+  .hover-scale:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  /* Enhanced card shadows */
+  .card-hover:hover {
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease-in-out;
+  }
+
+  /* Message bubble improvements for desktop */
+  .message-content {
+    max-width: 70%;
+  }
+
+  /* Sidebar improvements */
+  .sidebar-desktop {
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Input area enhancements */
+  .input-area {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .dark .input-area {
+    background: rgba(15, 15, 17, 0.8);
+  }
+
+  /* Typography improvements for desktop */
+  .desktop-typography {
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+
+  /* Animation optimizations */
+  .reduce-motion {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Responsive layout utilities */
+@media (min-width: 768px) {
+  .desktop-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  .sidebar-persistent {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 320px;
+    z-index: 40;
+  }
+  
+  .main-with-sidebar {
+    margin-left: 320px;
+    flex: 1;
+  }
+  
+  .chat-container {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+}
+
+/* Dark mode adjustments for web */
+@media (prefers-color-scheme: dark) {
+  .auto-dark {
+    background: rgb(15, 15, 17);
+    color: rgb(250, 250, 249);
+  }
+}
