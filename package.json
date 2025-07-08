@@ -1,6 +1,6 @@
 {
   "name": "create-automaticgpt-template",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AutomaticGPT - A production-ready Expo template with AI chat, authentication, conversation management, analytics, and sharing features",
   "main": "expo-router/entry",
   "keywords": [
